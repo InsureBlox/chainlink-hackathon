@@ -6,7 +6,7 @@ This project demonstrates a basic Hardhat use case. It comes with a sample contr
 Install hardhat 
 `npm install --save-dev hardhat`
 
-Export your [private key](https://metamask.zendesk.com/hc/en-us/articles/360015289632-How-to-Export-an-Account-Private-Key) and get Alchemy API key on `Rinkeby` (testnet with faucet system currently working).
+Export your [private key](https://metamask.zendesk.com/hc/en-us/articles/360015289632-How-to-Export-an-Account-Private-Key) and get Alchemy API key on `Kovan` (testnet with faucet system currently working and compatible with Keepers).
 Create `.env` file with the following properties:
 ```
 ALCHEMY_API_KEY = XXXXXXXXXX
@@ -29,4 +29,4 @@ npx hardhat help
 `npx hardhat coverage`
 
 ### Deploy
-`npx hardhat run scripts/deploy.js --network rinkeby`
+`npx hardhat run scripts/deploy.js --network kovan`

@@ -16,8 +16,8 @@ const privateKey = process.env.PRIVATE_KEY;
 module.exports = {
   solidity: "0.8.4",
   networks: {
-    rinkeby: {
-      url: `https://eth-rinkeby.alchemyapi.io/v2/${alchemyApiKey}`,
+    kovan: {
+      url: `https://eth-kovan.alchemyapi.io/v2/${alchemyApiKey}`,
       accounts: [`0x${privateKey}`]
     },
   },
