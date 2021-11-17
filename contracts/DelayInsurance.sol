@@ -29,7 +29,7 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
     }
 
     struct Coverage {
-        address beneficiary;
+        address payable beneficiary;
         uint256 startDate;
         uint256 endDate;
         uint256 startPort;
@@ -54,13 +54,12 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         uint256 policyId;
         Ship ship;
         Coverage coverage;
-        WeatherData weatherData;
+        uint8 incidents;
     }
 
-    event PolicySubscription (
-        address indexed beneficiary,
-        uint256 indexed id
-    );
+    event PolicySubscription(address indexed beneficiary, uint256 indexed id);
+    event IncidentReported(address indexed beneficiary, uint8 indexed actualNumberOfIncidents);
+    event PolicyPaidOut(address indexed beneficiary, uint256 indexed id);
 
     event PayOut(
         address indexed beneficiary,
@@ -81,6 +80,9 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
     bytes32 public trackingJobId;
     uint256 public trackingFee;
 
+    uint8 public incidentsThreshold = 1;
+
+    // Threshold for triggering claiming process
     // Prevents a function being run unless it's called by Insurance Provider
     modifier onlyOwner() {
         require(admin == msg.sender, "Only Insurance provider can do this");
@@ -131,7 +133,7 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         );
 
         Coverage memory coverage = Coverage({
-            beneficiary: msg.sender,
+            beneficiary: payable(msg.sender),
             startDate: _startDate,
             endDate: _endDate,
             startPort: _startPort,
@@ -151,7 +153,7 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
             policyId: policyId,
             ship: ship,
             coverage: coverage,
-            weatherData: weatherData
+            incidents: 0
         });
 
         policies[msg.sender] = policy;
@@ -285,31 +287,50 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
             policiesIndex < upcomingPolicies.length;
             policiesIndex++
         ) {
-            //Update policies statuts
-            if (upcomingPolicies[policiesIndex].coverage.startDate >= block.timestamp &&
-                  upcomingPolicies[policiesIndex].coverage.endDate < block.timestamp) {
-                policies[upcomingPolicies[policiesIndex].coverage.beneficiary].coverage.status = PolicyStatus.RUNNING;
-                // Request data weather data et memory it in the policy
+            Policy memory policy = upcomingPolicies[policiesIndex];
 
-                // Compare data to gust threshold
-                if(upcomingPolicies[policiesIndex].weatherData.gust >= upcomingPolicies[policiesIndex].coverage.gustThreshold)
-
+                  upcomingPolicies[policiesIndex].coverage.endDate > block.timestamp) {
+                // Update policy status
+                policies[policy.coverage.beneficiary].coverage.status = PolicyStatus.RUNNING;
+            // verify valid policies
+            if (upcomingPolicies[policiesIndex].coverage.startDate <= block.timestamp &&
 
 
-            } else if (upcomingPolicies[policiesIndex].coverage.endDate > block.timestamp) {
-              policies[upcomingPolicies[policiesIndex].coverage.beneficiary].coverage.status = PolicyStatus.COMPLETED;
-              delete upcomingPolicies[policiesIndex];
+                // TODO call external adapter which will verify if an incident occured based (location + weather)
+                if (hasIncident()) {
+                    // Update number of incidents
+                    policies[policy.coverage.beneficiary].incidents++;
+                    uint8 incidents = policies[policy.coverage.beneficiary].incidents;
+
+                    emit IncidentReported(policy.coverage.beneficiary, incidents);
+
+                    // Trigger claiming process using pre determined threshold
+                    if (incidents == incidentsThreshold) {
+                        payOut(policy.coverage.beneficiary, policy.coverage.premium, policy.policyId);
+                    }
+                }
+
+            } else if (policy.coverage.endDate >= block.timestamp) {
+              // Update policy status
+              policies[policy.coverage.beneficiary].coverage.status = PolicyStatus.COMPLETED;
+              // remove current policy from upcomingPolicies list
+              delete policy;
+
             }
 
         }
     }
 
-    function payOut() public payable {
-      require(policies[msg.sender].coverage.status == PolicyStatus.CLAIMED, "This policy is not claimed");
+    // Verify incidents via External Adapter
+    function hasIncident(/* Input data */) public returns (bool) {
+        // TODO add a proper implementation
+        return true;
+    }
 
-      uint256 _amount = policies[msg.sender].ship.shipmentValue;
-      payable(msg.sender).transfer(_amount);
-
-      emit PayOut(msg.sender, policyId, _amount);
+    function payOut(address payable beneficiary, uint256 premium, uint256 policyId) public payable {
+        // transfer funds to beneficiary
+        (bool sent, bytes memory data) = beneficiary.call{value: premium}("");
+        require(sent, "Failed to transfer insurance claim");
+        emit PolicyPaidOut(beneficiary, policyId);
     }
 }
