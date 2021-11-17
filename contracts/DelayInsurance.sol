@@ -12,6 +12,7 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
     enum PolicyStatus {
         CREATED, // Policy is subscribed
         RUNNING, // Policy cover is started
+        ARRIVED, // Ship is arrived to its destination
         COMPLETED, // Policy cover is finished without claim
         CLAIMED, // Policy is claimed, waiting for pay out
         PAIDOUT // Claim is paid out
@@ -34,7 +35,6 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         uint256 startPort;
         uint256 endPort;
         uint256 premium;
-        uint256 coverageAmount;
         uint256 gustThreshold;
         PolicyStatus status;
     }
@@ -54,16 +54,24 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         uint256 policyId;
         Ship ship;
         Coverage coverage;
+        WeatherData weatherData;
     }
 
-    event PolicySubscription(address indexed beneficiary, uint256 indexed id);
+    event PolicySubscription (
+        address indexed beneficiary,
+        uint256 indexed id
+    );
 
-    uint256 public lastTimeStamp;
+    event PayOut(
+        address indexed beneficiary,
+        uint256 indexed id,
+        uint256 indexed shipmentValue
+    );
 
-    //Policy[] public policies;
     mapping(address => Policy) public policies;
     Policy[] public upcomingPolicies;
 
+    uint256 public lastTimeStamp;
     address public admin;
     uint256 public policyId;
     address public weatherOracle;
@@ -78,6 +86,9 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         require(admin == msg.sender, "Only Insurance provider can do this");
         _;
     }
+
+    //Enable anyone to send eth to the smart contract
+    receive() external payable { }
 
     constructor() public {
         admin = msg.sender;
@@ -95,7 +106,11 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         uint256 _startPort,
         uint256 _endPort
     ) public payable {
-        Ship memory ship = Ship({id: _shipId, shipmentValue: _shipmentValue});
+
+        Ship memory ship = Ship({
+            id: _shipId,
+            shipmentValue: _shipmentValue
+          });
 
         uint256 _premium = pricePremium(
             ship,
@@ -122,15 +137,21 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
             startPort: _startPort,
             endPort: _endPort,
             premium: _premium,
-            coverageAmount: _shipmentValue,
             gustThreshold: _gustThreshold,
             status: PolicyStatus.CREATED
+        });
+
+        WeatherData memory weatherData = WeatherData({
+            requestId: 0,
+            location: Coordinate({lat: '0', lng: '0'}),
+            gust: 0
         });
 
         Policy memory policy = Policy({
             policyId: policyId,
             ship: ship,
-            coverage: coverage
+            coverage: coverage,
+            weatherData: weatherData
         });
 
         policies[msg.sender] = policy;
@@ -254,30 +275,41 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         bytes calldata /* performData */
     ) external override {
         lastTimeStamp = block.timestamp;
-        verifyIncidents();
+        UpdatePolicies();
     }
 
     // TODO make this function internal
-    function verifyIncidents() public onlyOwner {
+    function UpdatePolicies() public onlyOwner {
         for (
             uint256 policiesIndex = 0;
             policiesIndex < upcomingPolicies.length;
             policiesIndex++
         ) {
-            if (upcomingPolicies[policiesIndex].coverage.startDate >= block.timestamp && 
+            //Update policies statuts
+            if (upcomingPolicies[policiesIndex].coverage.startDate >= block.timestamp &&
                   upcomingPolicies[policiesIndex].coverage.endDate < block.timestamp) {
-      
                 policies[upcomingPolicies[policiesIndex].coverage.beneficiary].coverage.status = PolicyStatus.RUNNING;
+                // Request data weather data et memory it in the policy
 
-                //TODO verify if any incidents occured (if insurance claim process can be trigger)
-                if (true) {
-                  // WIP
-                }
+                // Compare data to gust threshold
+                if(upcomingPolicies[policiesIndex].weatherData.gust >= upcomingPolicies[policiesIndex].coverage.gustThreshold)
+
+
 
             } else if (upcomingPolicies[policiesIndex].coverage.endDate > block.timestamp) {
               policies[upcomingPolicies[policiesIndex].coverage.beneficiary].coverage.status = PolicyStatus.COMPLETED;
               delete upcomingPolicies[policiesIndex];
             }
+
         }
+    }
+
+    function payOut() public payable {
+      require(policies[msg.sender].coverage.status == PolicyStatus.CLAIMED, "This policy is not claimed");
+
+      uint256 _amount = policies[msg.sender].ship.shipmentValue;
+      payable(msg.sender).transfer(_amount);
+
+      emit PayOut(msg.sender, policyId, _amount);
     }
 }
