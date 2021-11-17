@@ -25,6 +25,10 @@ node scripts/sample-script.js
 npx hardhat help
 ```
 
+### Test
+Run the following command to perform the unit tests:
+`npx hardhat test`
+
 ### Test coverage
 `npx hardhat coverage`
 
