@@ -12,7 +12,6 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
     enum PolicyStatus {
         CREATED, // Policy is subscribed
         RUNNING, // Policy cover is started
-        ARRIVED, // Ship is arrived to its destination
         COMPLETED, // Policy cover is finished without claim
         CLAIMED, // Policy is claimed, waiting for pay out
         PAIDOUT // Claim is paid out
@@ -54,21 +53,28 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         uint256 policyId;
         Ship ship;
         Coverage coverage;
+        WeatherData weatherData;
         uint8 incidents;
     }
 
-    event PolicySubscription(address indexed beneficiary, uint256 indexed id);
-    event IncidentReported(address indexed beneficiary, uint8 indexed actualNumberOfIncidents);
-    event PolicyPaidOut(address indexed beneficiary, uint256 indexed id);
+    event PolicySubscription (
+        address indexed beneficiary,
+        uint256 indexed id
+    );
 
-    event PayOut(
+    event IncidentReported (
+        address indexed beneficiary,
+        uint8 indexed actualNumberOfIncidents
+    );
+
+    event PolicyPaidOut (
         address indexed beneficiary,
         uint256 indexed id,
         uint256 indexed shipmentValue
     );
 
     mapping(address => Policy) public policies;
-    Policy[] public upcomingPolicies;
+    address[] public addrPolicies;
 
     uint256 public lastTimeStamp;
     address public admin;
@@ -80,9 +86,8 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
     bytes32 public trackingJobId;
     uint256 public trackingFee;
 
-    uint8 public incidentsThreshold = 1;
+    uint8 public incidentsThreshold; // Threshold for triggering claiming process
 
-    // Threshold for triggering claiming process
     // Prevents a function being run unless it's called by Insurance Provider
     modifier onlyOwner() {
         require(admin == msg.sender, "Only Insurance provider can do this");
@@ -94,6 +99,7 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
 
     constructor() public {
         admin = msg.sender;
+        incidentsThreshold = 1;
         // Error on tests -> Transaction reverted: function call to a non-contract account
         //setPublicChainlinkToken();
     }
@@ -125,7 +131,6 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         require(_premium == msg.value, "You have to pay the exact Premium");
 
         uint256 _gustThreshold = calculateGustThreshold(
-            ship,
             _startDate,
             _endDate,
             _startPort,
@@ -153,21 +158,31 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
             policyId: policyId,
             ship: ship,
             coverage: coverage,
+            weatherData: weatherData,
             incidents: 0
         });
 
         policies[msg.sender] = policy;
-        upcomingPolicies.push(policy);
+        addrPolicies.push(msg.sender);
+
         emit PolicySubscription(msg.sender, policyId);
         policyId++;
     }
 
-    function getPolicy(address beneficiary)
-        public
-        view
-        returns (Policy memory)
-    {
+    function getPolicy() public view returns (Policy memory) {
         return policies[msg.sender];
+    }
+
+    function getGustThreshold() public view returns (uint256) {
+        return policies[msg.sender].coverage.gustThreshold;
+    }
+
+    function getPolicyStatus() public view returns (PolicyStatus) {
+        return policies[msg.sender].coverage.status;
+    }
+
+    function getLatestWeatherData() public view returns (WeatherData memory) {
+        return policies[msg.sender].weatherData;
     }
 
     /**********  PROTOCOL FUNCTIONS **********/
@@ -194,44 +209,16 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         weatherFee = _fee; // fees : X.X LINK
     }
 
+    // Set up incident threshold
+    function setIncidentThreshold(
+        uint8 _incidentsThreshold
+    ) public onlyOwner {
+        incidentsThreshold = _incidentsThreshold;
+    }
+
     /**********  ORACLES FUNCTIONS **********/
 
-    // // Create a Chainlink request to retrieve API response, find the target (https://docs.chain.link/docs/make-a-http-get-request/) (TO DO)
-    // function requestTrackingData() public returns (bytes32 requestId) {
-    //     Chainlink.Request memory request = buildChainlinkRequest(trackingJobId, address(this), this.fulfill.selector);
-    //     // GET & PATH REQUEST
-    //     request.add("get", "https://min-api.cryptocompare.com/data/pricemultifull?fsyms=ETH&tsyms=USD");
-    //     request.add("path", "RAW.ETH.USD.VOLUME24HOUR");
-    //     int timesAmount = 10**18; // Multiply the result by 10**18 to remove decimals
-    //     request.addInt("times", timesAmount);
-    //
-    //     return sendChainlinkRequestTo(trackingOracle, request, trackingFee);
-    // }
-    //
-    // // Receive the response in the form of uint256 (TO DO)
-    // uint256 resultTracking;
-    // function receiveTackingData(bytes32 _requestId, uint256 _location) public recordChainlinkFulfillment(_requestId) {
-    //   resultTracking = _location;
-    // }
-    //
-    //
-    // // Create a Chainlink request to retrieve API response, find the target (https://docs.chain.link/docs/make-a-http-get-request/) (TO DO)
-    // function requestWeatherData() public returns (bytes32 requestId) {
-    //     Chainlink.Request memory request = buildChainlinkRequest(weatherJobId, address(this), this.fulfill.selector);
-    //     // GET & PATH REQUEST
-    //     request.add("get", "https://min-api.cryptocompare.com/data/pricemultifull?fsyms=ETH&tsyms=USD");
-    //     request.add("path", "RAW.ETH.USD.VOLUME24HOUR");
-    //     int timesAmount = 10**18; // Multiply the result by 10**18 to remove decimals
-    //     request.addInt("times", timesAmount);
-    //
-    //     return sendChainlinkRequestTo(weatherOracle, request, weatherFee);
-    // }
-    //
-    // // Receive the response in the form of uint256 (TO DO)
-    // uint256 resultWeather;
-    // function receiveWeatherData(bytes32 _requestId, uint256 _location) public recordChainlinkFulfillment(_requestId) {
-    //   resultWeather = _location;
-    // }
+
 
     /**********  PRICING FUNCTIONS **********/
 
@@ -242,18 +229,17 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         uint256 _endDate,
         uint256 _startPort,
         uint256 _endPort
-    ) public payable returns (uint256) {
+    ) public view returns (uint256) {
         return _ship.shipmentValue / 200; // Hardvalue for a catnat event (occure 1/200)
     }
 
     // Calculate the gust threshold, above the threshold, the insurer pay out
     function calculateGustThreshold(
-        Ship memory _ship,
         uint256 _startDate,
         uint256 _endDate,
         uint256 _startPort,
         uint256 _endPort
-    ) public payable returns (uint256) {
+    ) public view returns (uint256) {
         return 100;
     }
 
@@ -277,60 +263,63 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         bytes calldata /* performData */
     ) external override {
         lastTimeStamp = block.timestamp;
-        UpdatePolicies();
+        verifyIncidents();
     }
 
     // TODO make this function internal
-    function UpdatePolicies() public onlyOwner {
+    function verifyIncidents() public onlyOwner {
         for (
             uint256 policiesIndex = 0;
-            policiesIndex < upcomingPolicies.length;
+            policiesIndex < addrPolicies.length;
             policiesIndex++
         ) {
-            Policy memory policy = upcomingPolicies[policiesIndex];
+            address addr = addrPolicies[policiesIndex];
+            Policy memory policy = policies[addr];
 
-                  upcomingPolicies[policiesIndex].coverage.endDate > block.timestamp) {
-                // Update policy status
-                policies[policy.coverage.beneficiary].coverage.status = PolicyStatus.RUNNING;
+            // Update policy status
+            policy.coverage.status = PolicyStatus.RUNNING;
             // verify valid policies
-            if (upcomingPolicies[policiesIndex].coverage.startDate <= block.timestamp &&
-
+            if (policy.coverage.startDate <= block.timestamp && policy.coverage.endDate > block.timestamp) {
 
                 // TODO call external adapter which will verify if an incident occured based (location + weather)
                 if (hasIncident()) {
                     // Update number of incidents
-                    policies[policy.coverage.beneficiary].incidents++;
-                    uint8 incidents = policies[policy.coverage.beneficiary].incidents;
+                    policy.incidents++;
+                    uint8 incidents = policy.incidents;
 
                     emit IncidentReported(policy.coverage.beneficiary, incidents);
 
                     // Trigger claiming process using pre determined threshold
-                    if (incidents == incidentsThreshold) {
-                        payOut(policy.coverage.beneficiary, policy.coverage.premium, policy.policyId);
+                    if (incidents >= incidentsThreshold) {
+                        policy.coverage.status = PolicyStatus.CLAIMED;
+                        payOut(policy.coverage.beneficiary);
                     }
                 }
-
             } else if (policy.coverage.endDate >= block.timestamp) {
               // Update policy status
-              policies[policy.coverage.beneficiary].coverage.status = PolicyStatus.COMPLETED;
+              policy.coverage.status = PolicyStatus.COMPLETED;
               // remove current policy from upcomingPolicies list
               delete policy;
 
             }
-
         }
     }
 
     // Verify incidents via External Adapter
+    // KR : Do we call the external for weather data, or to check if there is a claim ????
     function hasIncident(/* Input data */) public returns (bool) {
         // TODO add a proper implementation
         return true;
     }
 
-    function payOut(address payable beneficiary, uint256 premium, uint256 policyId) public payable {
-        // transfer funds to beneficiary
-        (bool sent, bytes memory data) = beneficiary.call{value: premium}("");
-        require(sent, "Failed to transfer insurance claim");
-        emit PolicyPaidOut(beneficiary, policyId);
+    function payOut(address payable _beneficiary) public payable {
+      // transfer funds to beneficiary
+      Policy memory policy = policies[_beneficiary];
+      (bool sent, bytes memory data) = _beneficiary.call{value: policy.ship.shipmentValue}("");
+      require(sent, "Failed to transfer insurance claim");
+      // Set contract to PAIDOUT
+      policy.coverage.status = PolicyStatus.PAIDOUT;
+      emit PolicyPaidOut(_beneficiary, policy.policyId, policy.ship.shipmentValue);
     }
+
 }
