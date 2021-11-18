@@ -56,3 +56,5 @@ cd frontend
 npm install
 npm start
 ```
+
+> ℹ️  Note: Run frontend on Localhost:8545 - do not use Hardhat network
