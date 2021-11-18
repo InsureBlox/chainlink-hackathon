@@ -11,7 +11,7 @@ import { TransactionErrorMessage } from "./TransactionErrorMessage";
 
 const HARDHAT_NETWORK_ID = "31337";
 
-const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
+//const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
 
 export class Dapp extends React.Component {
   constructor(props) {

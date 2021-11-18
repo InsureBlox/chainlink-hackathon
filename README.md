@@ -40,7 +40,7 @@ Run the following command to perform the unit tests:
 
 `npx hardhat coverage`
 
-### Run locally
+### Running locally
 
 `npx hardhat node` or `npx hardhat node --hostname 127.0.0.1`
 `npx hardhat run scripts/deploy.js --network localhost`
