@@ -1,7 +1,8 @@
-const { expect } = require("chai");
+const { expect, assert } = require("chai");
 const { ethers, waffle } = require("hardhat");
+const { expectRevert, time } = require('@openzeppelin/test-helpers')
 
-describe("Delay Insurance test", function () {
+describe('Delay Insurance test', function () {
 
   let DelayInsurance
   let delayInsurance
@@ -14,7 +15,7 @@ describe("Delay Insurance test", function () {
     await delayInsurance.deployed();
   });
 
-  it("should subscribe policy", async function () {
+  it('should subscribe policy', async function () {
     const [admin, customer] = await ethers.getSigners()
     let shipmentValue = 200000
     let pricePremium = shipmentValue / 200
@@ -25,7 +26,7 @@ describe("Delay Insurance test", function () {
     await expect(subscribePolicy).to.emit(delayInsurance, 'PolicySubscription').withArgs(customer.address, 0);
   });
 
-  it("should subscribe many policies", async function () {
+  it('should subscribe many policies', async function () {
     const [admin, customer1, customer2, customer3] = await ethers.getSigners()
     let shipmentValue = 200000
     let pricePremium = shipmentValue / 200
@@ -43,7 +44,7 @@ describe("Delay Insurance test", function () {
     await expect(subscribePolicy3).to.emit(delayInsurance, 'PolicySubscription').withArgs(customer3.address, 2);
   });
 
-  it("should verify incidents", async function () {
+  it('should verify incidents', async function () {
     const [admin, customer1] = await ethers.getSigners()
     let shipmentValue = 500000
     let pricePremium = shipmentValue / 200
@@ -68,7 +69,42 @@ describe("Delay Insurance test", function () {
     const customerBalance2 = await provider.getBalance(customer1.address);
     console.log("Customer balance after verifyIncidents: " + ethers.utils.formatEther(customerBalance2))
 
-    // Test Incomplete - WIP 
+    // Test Incomplete - WIP
+  });
+
+  it('Should revert if the premium is not paid', async () => {
+    const [customer] = await ethers.getSigners()
+    let shipmentValue = 200000
+    let pricePremium = shipmentValue / 200
+
+    let ex;
+    try {
+        await delayInsurance
+          .connect(customer)
+          .subscribePolicy("shipId_customer", shipmentValue, startDate, endDate, 1000, 2000, { from: customer.address, value: 0 })
+    }
+    catch (_ex) {
+        ex = _ex;
+    }
+    assert(ex, 'You should pay the premium amount')
+  });
+
+  it('Should get the policy gust threshold', async function () {
+    const [admin, customer] = await ethers.getSigners()
+    let shipmentValue = 200000
+    let pricePremium = shipmentValue / 200
+    let startDate = 974448412; // startDate 17/11/2000
+    let endDate = 1763366812; // startDate 17/11/2025
+
+    // Trigger subscribePolicy method
+    await delayInsurance
+      .connect(customer)
+      .subscribePolicy("shipId_customer", shipmentValue, startDate, endDate, 1000, 2000, { from: customer.address, value: pricePremium })
+
+    const policyThreshold = await delayInsurance.connect(customer).getGustThreshold();
+    const calculThreshold = await delayInsurance.connect(customer).calculateGustThreshold(0,0,0,0);
+
+    assert.equal(calculThreshold.toString(), policyThreshold.toString());
   });
 
 });
