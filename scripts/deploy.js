@@ -6,6 +6,29 @@ async function main() {
   console.log("Deploying contracts with the account: " + deployer.address);
   await delayInsurance.deployed();
   console.log("consumer deployed to:", delayInsurance.address);
+
+  saveFrontendFiles(delayInsurance);
+}
+
+function saveFrontendFiles(delayInsuranceContract) {
+  const fs = require("fs");
+  const contractsDir = __dirname + "/../frontend/src/contracts";
+
+  if (!fs.existsSync(contractsDir)) {
+    fs.mkdirSync(contractsDir);
+  }
+
+  fs.writeFileSync(
+    contractsDir + "/contract-address.json",
+    JSON.stringify({ Contract: delayInsuranceContract.address }, undefined, 2)
+  );
+
+  const DelayInsuranceArtifact = artifacts.readArtifactSync("DelayInsurance");
+
+  fs.writeFileSync(
+    contractsDir + "/InsuranceContract.json",
+    JSON.stringify(DelayInsuranceArtifact, null, 2)
+  );
 }
 
 main()

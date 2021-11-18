@@ -1,0 +1,8 @@
+{
+  "short_name": "Chainlink Hackathon Dapp",
+  "name": "Chainlink Hackathon Dapp",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
