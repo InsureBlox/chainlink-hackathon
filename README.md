@@ -32,6 +32,7 @@ npx hardhat help
 ```
 
 ### Test
+
 Run the following command to perform the unit tests:
 `npx hardhat test`
 
@@ -42,3 +43,11 @@ Run the following command to perform the unit tests:
 ### Deploy
 
 `npx hardhat run scripts/deploy.js --network kovan`
+
+### Frontend
+
+```shell
+cd frontend
+npm install
+npm start
+```
