@@ -51,71 +51,81 @@ export class Dapp extends React.Component {
 
         <hr />
 
-        <div class="form-group">
-          <label for="inputDeparturePort">Port of departure</label>
+        <div className="form-group">
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={this._subscribePolicy}
+          >
+            subscribePolicy
+          </button>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="inputDeparturePort">Port of departure</label>
           <input
             type="text"
-            class="form-control"
+            className="form-control"
             id="inputDeparturePort"
             aria-describedby="departurePortHelp"
             placeholder="Port of departure"
           />
-          <small id="departurePortHelp" class="form-text text-muted">
+          <small id="departurePortHelp" className="form-text text-muted">
             Help Text
           </small>
         </div>
 
-        <div class="form-group">
-          <label for="inputDepartureTime">Expected departure time</label>
+        <div className="form-group">
+          <label htmlFor="inputDepartureTime">Expected departure time</label>
           <input
             type="text"
-            class="form-control"
+            className="form-control"
             id="inputDepartureTime"
             aria-describedby="departureHelp"
             placeholder="Expected departure time"
           />
-          <small id="departureHelp" class="form-text text-muted">
+          <small id="departureHelp" className="form-text text-muted">
             Help Text
           </small>
         </div>
-        <div class="form-group">
-          <label for="inputArrivalPort">Port of arrival</label>
+        <div className="form-group">
+          <label htmlFor="inputArrivalPort">Port of arrival</label>
           <input
             type="text"
-            class="form-control"
+            className="form-control"
             id="inputArrivalPort"
             aria-describedby="arrivalPortHelp"
             placeholder="Port of arrival"
           />
-          <small id="arrivalPortHelp" class="form-text text-muted">
+          <small id="arrivalPortHelp" className="form-text text-muted">
             Help Text
           </small>
         </div>
 
-        <div class="form-group">
-          <label for="inputExpectedDepartue">Expected arrival time</label>
+        <div className="form-group">
+          <label htmlFor="inputExpectedDepartue">Expected arrival time</label>
           <input
             type="text"
-            class="form-control"
+            className="form-control"
             id="inputExpectedDepartue"
             aria-describedby="arrivalHelp"
             placeholder="Expected arrival time"
           />
-          <small id="arrivalHelp" class="form-text text-muted">
+          <small id="arrivalHelp" className="form-text text-muted">
             Help Text
           </small>
         </div>
 
-        <div class="form-group">
-          <label for="inputSumInsured">Sum insured</label>
+        <div className="form-group">
+          <label htmlFor="inputSumInsured">Sum insured</label>
           <input
             type="text"
-            class="form-control"
+            className="form-control"
             id="inputSumInsured"
             aria-describedby="sumInsuredHelp"
             placeholder="Expected arrival time"
           />
-          <small id="sumInsuredHelp" class="form-text text-muted">
+          <small id="sumInsuredHelp" className="form-text text-muted">
             Help Text
           </small>
         </div>
@@ -212,5 +222,34 @@ export class Dapp extends React.Component {
     });
 
     return false;
+  }
+
+  async _subscribePolicy() {
+    // const [admin, customer] = await ethers.getSigners();
+    let shipmentValue = 200000;
+    let pricePremium = shipmentValue / 200;
+
+    /* let DelayInsurance;
+    let delayInsurance;
+
+    DelayInsurance = await ethers.getContractFactory("DelayInsurance");
+    delayInsurance = await DelayInsurance.deploy();
+    await delayInsurance.deployed(); */
+
+    const customer = this._provider.getSigner(0);
+
+    // Trigger subscribePolicy method using mocked data
+    let subscribePolicy = this._delayInsurance
+      .connect(customer)
+      .subscribePolicy(
+        "shipId",
+        shipmentValue,
+        1637386377,
+        1637559177,
+        1000,
+        2000,
+        { from: customer.address, value: pricePremium }
+      );
+    console.log(subscribePolicy);
   }
 }
