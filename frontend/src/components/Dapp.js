@@ -236,10 +236,12 @@ export class Dapp extends React.Component {
     delayInsurance = await DelayInsurance.deploy();
     await delayInsurance.deployed(); */
 
-    const customer = this._provider.getSigner(0);
+    // const customer = this._provider.getSigner(0);
+    const customer = this._delayInsurance.signer;
+    console.log(customer);
 
     // Trigger subscribePolicy method using mocked data
-    let subscribePolicy = this._delayInsurance
+    /* let subscribePolicy = this._delayInsurance
       .connect(customer)
       .subscribePolicy(
         "shipId",
@@ -249,7 +251,16 @@ export class Dapp extends React.Component {
         1000,
         2000,
         { from: customer.address, value: pricePremium }
-      );
+      ); */
+    let subscribePolicy = this._delayInsurance.subscribePolicy(
+      "shipId",
+      shipmentValue,
+      1637386377,
+      1637559177,
+      1000,
+      2000,
+      { from: customer.address, value: pricePremium }
+    );
     console.log(subscribePolicy);
   }
 }
