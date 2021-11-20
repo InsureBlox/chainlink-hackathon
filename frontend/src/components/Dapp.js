@@ -45,17 +45,83 @@ export class Dapp extends React.Component {
       <div className="container p-4">
         <div className="row">
           <div className="col-12">
-            <h1>
-              Chainlink Hackathon
-            </h1>
+            <h1>Chainlink Hackathon</h1>
           </div>
         </div>
 
         <hr />
 
+        <div class="form-group">
+          <label for="inputDeparturePort">Port of departure</label>
+          <input
+            type="text"
+            class="form-control"
+            id="inputDeparturePort"
+            aria-describedby="departurePortHelp"
+            placeholder="Port of departure"
+          />
+          <small id="departurePortHelp" class="form-text text-muted">
+            Help Text
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="inputDepartureTime">Expected departure time</label>
+          <input
+            type="text"
+            class="form-control"
+            id="inputDepartureTime"
+            aria-describedby="departureHelp"
+            placeholder="Expected departure time"
+          />
+          <small id="departureHelp" class="form-text text-muted">
+            Help Text
+          </small>
+        </div>
+        <div class="form-group">
+          <label for="inputArrivalPort">Port of arrival</label>
+          <input
+            type="text"
+            class="form-control"
+            id="inputArrivalPort"
+            aria-describedby="arrivalPortHelp"
+            placeholder="Port of arrival"
+          />
+          <small id="arrivalPortHelp" class="form-text text-muted">
+            Help Text
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="inputExpectedDepartue">Expected arrival time</label>
+          <input
+            type="text"
+            class="form-control"
+            id="inputExpectedDepartue"
+            aria-describedby="arrivalHelp"
+            placeholder="Expected arrival time"
+          />
+          <small id="arrivalHelp" class="form-text text-muted">
+            Help Text
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="inputSumInsured">Sum insured</label>
+          <input
+            type="text"
+            class="form-control"
+            id="inputSumInsured"
+            aria-describedby="sumInsuredHelp"
+            placeholder="Expected arrival time"
+          />
+          <small id="sumInsuredHelp" class="form-text text-muted">
+            Help Text
+          </small>
+        </div>
+
         <div className="row">
           <div className="col-12">
-
             {this.state.transactionError && (
               <TransactionErrorMessage
                 message={this._getRpcErrorMessage(this.state.transactionError)}
@@ -69,7 +135,6 @@ export class Dapp extends React.Component {
   }
 
   async _connectWallet() {
-
     // It returns a promise that will resolve to the user's address.
     const [selectedAddress] = await window.ethereum.enable();
 
@@ -99,7 +164,6 @@ export class Dapp extends React.Component {
   }
 
   _initialize(userAddress) {
-
     // We first store the user's address in the component's state
     this.setState({
       selectedAddress: userAddress,
