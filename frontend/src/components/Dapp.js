@@ -315,5 +315,18 @@ export class Dapp extends React.Component {
     const INSURANCE_NUMBER_DEFAULT = 200;
 
     let insuredSum = Math.round(this.state.shipmentValue / INSURANCE_NUMBER_DEFAULT);
+
+
+      await insuranceContract.subscribePolicy(
+        this.state.shipId,
+        this.state.shipmentValue,
+        (new Date(this.state.departureDate).getTime() / 1000),
+        (new Date(this.state.arrivalDate).getTime() / 1000),
+        this.state.departurePort,
+        this.state.arrivalPort,
+        { value: insuredSum }
+      );
+      window.alert("Transaction success!")
+
   }
 }
