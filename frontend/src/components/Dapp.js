@@ -66,7 +66,7 @@ export class Dapp extends React.Component {
         <hr />
 
         <div className="form-group">
-          <div class="form-row">
+          <div className="form-row">
             <div className="col-sm-6">
               <label htmlFor="inputDeparturePort">Port of departure</label>
               <input
@@ -100,7 +100,7 @@ export class Dapp extends React.Component {
             </div>
           </div>
 
-          <div class="form-row">
+          <div className="form-row">
             <div className="col-sm-6">
               <label htmlFor="inputArrivalPort">Port of arrival</label>
               <input
@@ -134,7 +134,7 @@ export class Dapp extends React.Component {
             </div>
           </div>
 
-          <div class="form-row">
+          <div className="form-row">
             <div className="col-sm-6">
               <label htmlFor="inputSumInsured">Sum insured</label>
               <input
