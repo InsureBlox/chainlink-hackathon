@@ -23,6 +23,12 @@ export class Dapp extends React.Component {
       selectedAddress: undefined,
       transactionError: undefined,
       networkError: undefined,
+      departurePort: "",
+      departureDate: "",
+      arrivalPort: "",
+      arrivalDate: "",
+      insuredSum: "",
+      shipmentValue: "123",
     };
 
     this.state = this.initialState;
@@ -75,6 +81,10 @@ export class Dapp extends React.Component {
                 id="inputDeparturePort"
                 aria-describedby="departurePortHelp"
                 placeholder="Port of departure"
+                value={this.state.departurePort}
+                onChange={(e) =>
+                  this.setState({ departurePort: e.target.value })
+                }
               />
               <small id="departurePortHelp" className="form-text text-muted">
                 Help Text
@@ -93,6 +103,10 @@ export class Dapp extends React.Component {
                 id="inputDepartureDate"
                 aria-describedby="departureHelp"
                 placeholder="Expected departure date"
+                value={this.state.departureDate}
+                onChange={(e) =>
+                  this.setState({ departureDate: e.target.value })
+                }
               />
               <small id="departureHelp" className="form-text text-muted">
                 Help Text
@@ -109,6 +123,8 @@ export class Dapp extends React.Component {
                 id="inputArrivalPort"
                 aria-describedby="arrivalPortHelp"
                 placeholder="Port of arrival"
+                value={this.state.arrivalPort}
+                onChange={(e) => this.setState({ arrivalPort: e.target.value })}
               />
               <small id="arrivalPortHelp" className="form-text text-muted">
                 Help Text
@@ -127,6 +143,8 @@ export class Dapp extends React.Component {
                 id="inputExpectedDeparture"
                 aria-describedby="arrivalHelp"
                 placeholder="Expected arrival date"
+                value={this.state.arrivalDate}
+                onChange={(e) => this.setState({ arrivalDate: e.target.value })}
               />
               <small id="arrivalHelp" className="form-text text-muted">
                 Help Text
@@ -143,6 +161,8 @@ export class Dapp extends React.Component {
                 id="inputSumInsured"
                 aria-describedby="sumInsuredHelp"
                 placeholder="Sum insured"
+                value={this.state.insuredSum}
+                onChange={(e) => this.setState({ insuredSum: e.target.value })}
               />
               <small id="sumInsuredHelp" className="form-text text-muted">
                 Help Text
@@ -156,6 +176,10 @@ export class Dapp extends React.Component {
                 id="inputShipmentValue"
                 aria-describedby="shipmentValueHelp"
                 placeholder="Sum insured"
+                value={this.state.shipmentValue}
+                onChange={(e) =>
+                  this.setState({ shipmentValue: e.target.value })
+                }
               />
               <small id="shipmentValueHelp" className="form-text text-muted">
                 Help Text
@@ -163,6 +187,9 @@ export class Dapp extends React.Component {
             </div>
           </div>
         </div>
+
+        <div>State</div>
+        <div className="word-break">{JSON.stringify(this.state)}</div>
 
         <div className="row">
           <div className="col-12">
