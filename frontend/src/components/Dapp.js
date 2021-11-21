@@ -9,6 +9,8 @@ import { NoWalletDetected } from "./NoWalletDetected";
 import { ConnectWallet } from "./ConnectWallet";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 
+import "../index.css";
+
 const HARDHAT_NETWORK_ID = "31337";
 
 //const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
@@ -61,73 +63,92 @@ export class Dapp extends React.Component {
           </button>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="inputDeparturePort">Port of departure</label>
-          <input
-            type="text"
-            className="form-control"
-            id="inputDeparturePort"
-            aria-describedby="departurePortHelp"
-            placeholder="Port of departure"
-          />
-          <small id="departurePortHelp" className="form-text text-muted">
-            Help Text
-          </small>
-        </div>
+        <hr />
 
         <div className="form-group">
-          <label htmlFor="inputDepartureTime">Expected departure time</label>
-          <input
-            type="text"
-            className="form-control"
-            id="inputDepartureTime"
-            aria-describedby="departureHelp"
-            placeholder="Expected departure time"
-          />
-          <small id="departureHelp" className="form-text text-muted">
-            Help Text
-          </small>
-        </div>
-        <div className="form-group">
-          <label htmlFor="inputArrivalPort">Port of arrival</label>
-          <input
-            type="text"
-            className="form-control"
-            id="inputArrivalPort"
-            aria-describedby="arrivalPortHelp"
-            placeholder="Port of arrival"
-          />
-          <small id="arrivalPortHelp" className="form-text text-muted">
-            Help Text
-          </small>
-        </div>
+          <div class="form-row">
+            <div className="col-sm-6">
+              <label htmlFor="inputDeparturePort">Port of departure</label>
+              <input
+                type="text"
+                className="form-control"
+                id="inputDeparturePort"
+                aria-describedby="departurePortHelp"
+                placeholder="Port of departure"
+              />
+              <small id="departurePortHelp" className="form-text text-muted">
+                Help Text
+              </small>
+            </div>
 
-        <div className="form-group">
-          <label htmlFor="inputExpectedDepartue">Expected arrival time</label>
-          <input
-            type="text"
-            className="form-control"
-            id="inputExpectedDepartue"
-            aria-describedby="arrivalHelp"
-            placeholder="Expected arrival time"
-          />
-          <small id="arrivalHelp" className="form-text text-muted">
-            Help Text
-          </small>
-        </div>
+            <div className="col-sm-6">
+              <label htmlFor="inputDepartureDate">
+                Expected departure date
+              </label>
+              <input
+                type="date"
+                max="2100-12-31"
+                min="2021-01-01"
+                className="form-control"
+                id="inputDepartureDate"
+                aria-describedby="departureHelp"
+                placeholder="Expected departure date"
+              />
+              <small id="departureHelp" className="form-text text-muted">
+                Help Text
+              </small>
+            </div>
+          </div>
 
-        <div className="form-group">
-          <label htmlFor="inputSumInsured">Sum insured</label>
-          <input
-            type="text"
-            className="form-control"
-            id="inputSumInsured"
-            aria-describedby="sumInsuredHelp"
-            placeholder="Expected arrival time"
-          />
-          <small id="sumInsuredHelp" className="form-text text-muted">
-            Help Text
-          </small>
+          <div class="form-row">
+            <div className="col-sm-6">
+              <label htmlFor="inputArrivalPort">Port of arrival</label>
+              <input
+                type="text"
+                className="form-control"
+                id="inputArrivalPort"
+                aria-describedby="arrivalPortHelp"
+                placeholder="Port of arrival"
+              />
+              <small id="arrivalPortHelp" className="form-text text-muted">
+                Help Text
+              </small>
+            </div>
+
+            <div className="col-sm-6">
+              <label htmlFor="inputExpectedDeparture">
+                Expected arrival date
+              </label>
+              <input
+                type="date"
+                max="2100-12-31"
+                min="2021-01-01"
+                className="form-control"
+                id="inputExpectedDeparture"
+                aria-describedby="arrivalHelp"
+                placeholder="Expected arrival date"
+              />
+              <small id="arrivalHelp" className="form-text text-muted">
+                Help Text
+              </small>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div className="col-sm-6">
+              <label htmlFor="inputSumInsured">Sum insured</label>
+              <input
+                type="text"
+                className="form-control"
+                id="inputSumInsured"
+                aria-describedby="sumInsuredHelp"
+                placeholder="Sum insured"
+              />
+              <small id="sumInsuredHelp" className="form-text text-muted">
+                Help Text
+              </small>
+            </div>
+          </div>
         </div>
 
         <div className="row">
