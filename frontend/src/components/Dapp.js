@@ -189,14 +189,18 @@ export class Dapp extends React.Component {
         </div>
 
         <div>State</div>
-        <div>
-          Unix departure date:{" "}
-          {(new Date(this.state.departureDate).getTime() / 1000).toString()}
-        </div>
-        <div>
-          Unix arrival date:{" "}
-          {(new Date(this.state.arrivalDate).getTime() / 1000).toString()}
-        </div>
+        {this.state.departureDate && (
+          <div>
+            Unix departure date:{" "}
+            {(new Date(this.state.departureDate).getTime() / 1000).toString()}
+          </div>
+        )}
+        {this.state.arrivalDate && (
+          <div>
+            Unix arrival date:{" "}
+            {(new Date(this.state.arrivalDate).getTime() / 1000).toString()}
+          </div>
+        )}
         <div className="word-break">{JSON.stringify(this.state)}</div>
 
         <div className="row">
