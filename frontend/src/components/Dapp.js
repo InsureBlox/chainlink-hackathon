@@ -328,6 +328,10 @@ export class Dapp extends React.Component {
       );
       window.alert("Transaction success!")
     } catch (error) {
+      if (error.code === ERROR_CODE_TX_REJECTED_BY_USER) {
+        console.log("User rejected the transaction.")
+        return;
+      }
       console.log(error)
     }
   }
