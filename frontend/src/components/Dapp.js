@@ -300,6 +300,20 @@ export class Dapp extends React.Component {
   }
 
   async _subscribePolicy(event) {
-    
+    event.preventDefault();
+
+    // TODO Validate the fields here or somewhere else
+    if (this.state.shipId == "") {
+      console.log("Invalid field(s)")
+      return;
+    }
+
+    // TODO 
+    // customer shoudn't be able to change this value
+    // hardvalue for a catnat event (occure 1/200) same as SmartContract 
+    // we may change this soon
+    const INSURANCE_NUMBER_DEFAULT = 200;
+
+    let insuredSum = Math.round(this.state.shipmentValue / INSURANCE_NUMBER_DEFAULT);
   }
 }
