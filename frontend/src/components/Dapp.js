@@ -148,6 +148,19 @@ export class Dapp extends React.Component {
                 Help Text
               </small>
             </div>
+            <div className="col-sm-6">
+              <label htmlFor="inputShipmentValue">Shipment Value</label>
+              <input
+                type="text"
+                className="form-control"
+                id="inputShipmentValue"
+                aria-describedby="shipmentValueHelp"
+                placeholder="Sum insured"
+              />
+              <small id="shipmentValueHelp" className="form-text text-muted">
+                Help Text
+              </small>
+            </div>
           </div>
         </div>
 
