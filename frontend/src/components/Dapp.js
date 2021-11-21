@@ -74,7 +74,7 @@ export class Dapp extends React.Component {
         <hr />
 
         <div className="form-group">
-        <div className="form-row">
+          <div className="form-row">
             <div className="col-sm-6">
               <label htmlFor="inputShipId">Ship Id</label>
               <input
