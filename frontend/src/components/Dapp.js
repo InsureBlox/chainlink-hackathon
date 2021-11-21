@@ -316,7 +316,7 @@ export class Dapp extends React.Component {
 
     let insuredSum = Math.round(this.state.shipmentValue / INSURANCE_NUMBER_DEFAULT);
 
-
+    try {
       await insuranceContract.subscribePolicy(
         this.state.shipId,
         this.state.shipmentValue,
@@ -327,6 +327,8 @@ export class Dapp extends React.Component {
         { value: insuredSum }
       );
       window.alert("Transaction success!")
-
+    } catch (error) {
+      console.log(error)
+    }
   }
 }
