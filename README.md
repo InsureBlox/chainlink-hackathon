@@ -54,7 +54,9 @@ Run the following command to perform the unit tests:
 
 Add and `.env` under `/frontend` folder with the following instruction:
 
-`SKIP_PREFLIGHT_CHECK=true` - see more [details](https://newbedev.com/javascript-skip-preflight-check-true-to-an-env-file-in-your-project-code-example)
+`SKIP_PREFLIGHT_CHECK=true` 
+
+See more [details](https://newbedev.com/javascript-skip-preflight-check-true-to-an-env-file-in-your-project-code-example)
 
 ```shell
 cd frontend
