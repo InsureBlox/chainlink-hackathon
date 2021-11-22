@@ -44,6 +44,7 @@ Run the following command to perform the unit tests:
 
 `npx hardhat node` or `npx hardhat node --hostname 127.0.0.1`
 `npx hardhat run scripts/deploy.js --network localhost`
+> ℹ️  Connect metamask to Localhost:8545: RPC URL: http://localhost:8545 | Chain ID: 31337
 
 ### Deploy
 
@@ -51,10 +52,12 @@ Run the following command to perform the unit tests:
 
 ### Frontend
 
+Add and `.env` under `/frontend` folder with the following instruction:
+
+`SKIP_PREFLIGHT_CHECK=true` - see more [details](https://newbedev.com/javascript-skip-preflight-check-true-to-an-env-file-in-your-project-code-example)
+
 ```shell
 cd frontend
 npm install
 npm start
 ```
-
-> ℹ️  Note: Run frontend on Localhost:8545 - do not use Hardhat network
