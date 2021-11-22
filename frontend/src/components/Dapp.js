@@ -13,7 +13,8 @@ import "../index.css";
 
 const HARDHAT_NETWORK_ID = "31337";
 
-//const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
+const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
+let insuranceContract
 
 export class Dapp extends React.Component {
   constructor(props) {
@@ -23,12 +24,12 @@ export class Dapp extends React.Component {
       selectedAddress: undefined,
       transactionError: undefined,
       networkError: undefined,
+      shipId: "",
+      shipmentValue: "",
       departurePort: "",
       departureDate: "",
       arrivalPort: "",
-      arrivalDate: "",
-      insuredSum: "",
-      shipmentValue: "123",
+      arrivalDate: ""
     };
 
     this.state = this.initialState;
@@ -63,7 +64,8 @@ export class Dapp extends React.Component {
           <button
             type="button"
             className="btn btn-primary"
-            onClick={this._subscribePolicy}
+            onClick=
+            {(event) => this._subscribePolicy(event)}
           >
             subscribePolicy
           </button>
@@ -72,6 +74,41 @@ export class Dapp extends React.Component {
         <hr />
 
         <div className="form-group">
+          <div className="form-row">
+            <div className="col-sm-6">
+              <label htmlFor="inputShipId">Ship Id</label>
+              <input
+                type="text"
+                className="form-control"
+                id="inputShipId"
+                aria-describedby="shipIdHelp"
+                placeholder="Ship Id"
+                value={this.state.shipId}
+                onChange={(e) => this.setState({ shipId: e.target.value })}
+              />
+              <small id="shipIdHelp" className="form-text text-muted">
+                Help Text
+              </small>
+            </div>
+            <div className="col-sm-6">
+              <label htmlFor="inputShipmentValue">Shipment Value</label>
+              <input
+                type="text"
+                className="form-control"
+                id="inputShipmentValue"
+                aria-describedby="shipmentValueHelp"
+                placeholder="Shipment Value"
+                value={this.state.shipmentValue}
+                onChange={(e) =>
+                  this.setState({ shipmentValue: e.target.value })
+                }
+              />
+              <small id="shipmentValueHelp" className="form-text text-muted">
+                Help Text
+              </small>
+            </div>
+          </div>
+
           <div className="form-row">
             <div className="col-sm-6">
               <label htmlFor="inputDeparturePort">Port of departure</label>
@@ -151,41 +188,6 @@ export class Dapp extends React.Component {
               </small>
             </div>
           </div>
-
-          <div className="form-row">
-            <div className="col-sm-6">
-              <label htmlFor="inputSumInsured">Sum insured</label>
-              <input
-                type="text"
-                className="form-control"
-                id="inputSumInsured"
-                aria-describedby="sumInsuredHelp"
-                placeholder="Sum insured"
-                value={this.state.insuredSum}
-                onChange={(e) => this.setState({ insuredSum: e.target.value })}
-              />
-              <small id="sumInsuredHelp" className="form-text text-muted">
-                Help Text
-              </small>
-            </div>
-            <div className="col-sm-6">
-              <label htmlFor="inputShipmentValue">Shipment Value</label>
-              <input
-                type="text"
-                className="form-control"
-                id="inputShipmentValue"
-                aria-describedby="shipmentValueHelp"
-                placeholder="Sum insured"
-                value={this.state.shipmentValue}
-                onChange={(e) =>
-                  this.setState({ shipmentValue: e.target.value })
-                }
-              />
-              <small id="shipmentValueHelp" className="form-text text-muted">
-                Help Text
-              </small>
-            </div>
-          </div>
         </div>
 
         <div>State</div>
@@ -258,7 +260,7 @@ export class Dapp extends React.Component {
   async _intializeEthers() {
     this._provider = new ethers.providers.Web3Provider(window.ethereum);
 
-    this._delayInsurance = new ethers.Contract(
+    insuranceContract = await new ethers.Contract(
       contractAddress.Contract,
       DelayInsuranceArtifact.abi,
       this._provider.getSigner(0)
@@ -297,43 +299,40 @@ export class Dapp extends React.Component {
     return false;
   }
 
-  async _subscribePolicy() {
-    // const [admin, customer] = await ethers.getSigners();
-    let shipmentValue = 200000;
-    let pricePremium = shipmentValue / 200;
+  async _subscribePolicy(event) {
+    event.preventDefault();
 
-    /* let DelayInsurance;
-    let delayInsurance;
+    // TODO Validate the fields here or somewhere else
+    if (this.state.shipId == "") {
+      console.log("Invalid field(s)")
+      return;
+    }
 
-    DelayInsurance = await ethers.getContractFactory("DelayInsurance");
-    delayInsurance = await DelayInsurance.deploy();
-    await delayInsurance.deployed(); */
+    // TODO 
+    // customer shoudn't be able to change this value
+    // hardvalue for a catnat event (occure 1/200) same as SmartContract 
+    // we may change this soon
+    const INSURANCE_NUMBER_DEFAULT = 200;
 
-    // const customer = this._provider.getSigner(0);
-    const customer = this._delayInsurance.signer;
-    console.log(customer);
+    let insuredSum = Math.round(this.state.shipmentValue / INSURANCE_NUMBER_DEFAULT);
 
-    // Trigger subscribePolicy method using mocked data
-    /* let subscribePolicy = this._delayInsurance
-      .connect(customer)
-      .subscribePolicy(
-        "shipId",
-        shipmentValue,
-        1637386377,
-        1637559177,
-        1000,
-        2000,
-        { from: customer.address, value: pricePremium }
-      ); */
-    let subscribePolicy = this._delayInsurance.subscribePolicy(
-      "shipId",
-      shipmentValue,
-      1637386377,
-      1637559177,
-      1000,
-      2000,
-      { from: customer.address, value: pricePremium }
-    );
-    console.log(subscribePolicy);
+    try {
+      await insuranceContract.subscribePolicy(
+        this.state.shipId,
+        this.state.shipmentValue,
+        (new Date(this.state.departureDate).getTime() / 1000),
+        (new Date(this.state.arrivalDate).getTime() / 1000),
+        this.state.departurePort,
+        this.state.arrivalPort,
+        { value: insuredSum }
+      );
+      window.alert("Transaction success!")
+    } catch (error) {
+      if (error.code === ERROR_CODE_TX_REJECTED_BY_USER) {
+        console.log("User rejected the transaction.")
+        return;
+      }
+      console.log(error)
+    }
   }
 }
