@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: Unlicense
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.7;
 
 import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/KeeperCompatibleInterface.sol";
@@ -196,17 +196,6 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
 
     /**********  PROTOCOL FUNCTIONS **********/
 
-    // Set up ship tracking oracle datas
-    function setTrackingOracle(
-        address _oracleAddress,
-        bytes32 _jobId,
-        uint256 _fee
-    ) public onlyOwner {
-        trackingOracle = _oracleAddress; // address :
-        trackingJobId = _jobId; // jobId  :
-        trackingFee = _fee; // fees : X.X LINK
-    }
-
     // Set up weather oracle datas
     function setWeatherOracle(
         address _oracleAddress,
@@ -300,7 +289,7 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
     }
 
     function receiveWeatherData(bytes32 _requestId, uint256 _gust) public recordChainlinkFulfillment(_requestId) {
-      Policy storage policy = policies[requestToPolicyAddr[_requestId]];
+        Policy storage policy = policies[requestToPolicyAddr[_requestId]];
       address addr = requestToPolicyAddr[_requestId];
       policy.weatherData.gust = _gust;
       // remove current requestId from requestToPolicyAddr list
@@ -313,7 +302,7 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         emit IncidentReported(addr, policy.incidents);
       }
 
-      if (policy.incidents >= incidentsThreshold /* + Should be at end port */) {
+      if (policy.incidents >= incidentsThreshold /* + Should be at end port? */) {
         policy.coverage.status = PolicyStatus.CLAIMED;
       }
     }
@@ -328,10 +317,10 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
       }
     }
 
-    function payOut(address _beneficiary) public payable {
+    function payOut(address _beneficiary) public payable onlyOwner {
       // transfer funds to beneficiary
       Policy memory policy = policies[_beneficiary];
-      (bool sent, bytes memory data) = _beneficiary.call{value: policy.ship.shipmentValue}("");
+      (bool sent, bytes memory data) = _beneficiary.call{value: 10}("");
       require(sent, "Failed to transfer insurance claim");
       // Set contract to PAIDOUT
       policy.coverage.status = PolicyStatus.PAIDOUT;
