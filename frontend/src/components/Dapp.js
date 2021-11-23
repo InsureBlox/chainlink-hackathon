@@ -41,8 +41,6 @@ export class Dapp extends React.Component {
       departureDate: "",
       arrivalPort: "",
       arrivalDate: "",
-      policyId: "",
-      policyStatus: "",
     };
 
     this.state = this.initialState;
@@ -54,23 +52,9 @@ export class Dapp extends React.Component {
       "Access-Control-Allow-Origin": "*",
     };
 
-    axios({
-      method: "get",
-      url: `https://api.datalastic.com/api/v0/vessel_inradius?api-key=XXX&lat=29.15915&lon=-89.25454&radius=10`,
-      withCredentials: false,
-      headers,
-    })
-      .then(function (response) {
-        // handle success
-        console.log(response);
-      })
-      .catch(function (error) {
-        // handle error
-        console.log(error);
-      }); */
-    /* axios
+    axios
       .get(
-        "https://api.datalastic.com/api/v0/vessel_inradius?api-key=XXX&lat=29.15915&lon=-89.25454&radius=10",
+        "https://api.datalastic.com/api/v0/vessel_inradius?api-key=f9ff0ee8-5644-43e5-847d-39cbd67858e1&lat=29.15915&lon=-89.25454&radius=10",
         { headers }
       )
       .then(function (response) {
@@ -165,6 +149,18 @@ export class Dapp extends React.Component {
             </button>
 
           </div>
+        </div>
+
+        <hr />
+
+        <div className="form-group">
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={(event) => this._subscribePolicy(event)}
+          >
+            subscribePolicy
+          </button>
         </div>
 
         <hr />
@@ -469,6 +465,7 @@ export class Dapp extends React.Component {
         </div>
 
         <div>State</div>
+        <div>{process.env.REACT_APP_VESSEL_API_KEY}</div>
         {this.state.departureDate && (
           <div>
             Unix departure date:{" "}
@@ -618,14 +615,10 @@ export class Dapp extends React.Component {
         this.state.arrivalPort,
         { value: insuredSum }
       );
-
-      // TODO improve UX
-      window.alert("Transaction success!")
-
       window.alert("Transaction success!");
     } catch (error) {
       if (error.code === ERROR_CODE_TX_REJECTED_BY_USER) {
-        this.setState({ transactionError: "User rejected the transaction." });
+        console.log("User rejected the transaction.");
         return;
       }
       console.log(error);
