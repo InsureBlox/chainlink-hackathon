@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 
 import { ethers } from "ethers";
 
@@ -14,7 +15,7 @@ import "../index.css";
 const HARDHAT_NETWORK_ID = "31337";
 
 const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
-let insuranceContract
+let insuranceContract;
 
 export class Dapp extends React.Component {
   constructor(props) {
@@ -29,10 +30,31 @@ export class Dapp extends React.Component {
       departurePort: "",
       departureDate: "",
       arrivalPort: "",
-      arrivalDate: ""
+      arrivalDate: "",
     };
 
     this.state = this.initialState;
+  }
+
+  componentDidMount() {
+    /* const headers = {
+      "Content-Type": "application/json", // "application/x-www-form-urlencoded", // "text/plain",
+      "Access-Control-Allow-Origin": "*",
+    };
+
+    axios
+      .get(
+        "https://api.datalastic.com/api/v0/vessel_inradius?api-key=f9ff0ee8-5644-43e5-847d-39cbd67858e1&lat=29.15915&lon=-89.25454&radius=10",
+        { headers }
+      )
+      .then(function (response) {
+        // handle success
+        console.log(response);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+      }); */
   }
 
   render() {
@@ -64,8 +86,7 @@ export class Dapp extends React.Component {
           <button
             type="button"
             className="btn btn-primary"
-            onClick=
-            {(event) => this._subscribePolicy(event)}
+            onClick={(event) => this._subscribePolicy(event)}
           >
             subscribePolicy
           </button>
@@ -191,6 +212,7 @@ export class Dapp extends React.Component {
         </div>
 
         <div>State</div>
+        <div>{process.env.REACT_APP_VESSEL_API_KEY}</div>
         {this.state.departureDate && (
           <div>
             Unix departure date:{" "}
@@ -304,35 +326,37 @@ export class Dapp extends React.Component {
 
     // TODO Validate the fields here or somewhere else
     if (this.state.shipId == "") {
-      console.log("Invalid field(s)")
+      console.log("Invalid field(s)");
       return;
     }
 
-    // TODO 
+    // TODO
     // customer shoudn't be able to change this value
-    // hardvalue for a catnat event (occure 1/200) same as SmartContract 
+    // hardvalue for a catnat event (occure 1/200) same as SmartContract
     // we may change this soon
     const INSURANCE_NUMBER_DEFAULT = 200;
 
-    let insuredSum = Math.round(this.state.shipmentValue / INSURANCE_NUMBER_DEFAULT);
+    let insuredSum = Math.round(
+      this.state.shipmentValue / INSURANCE_NUMBER_DEFAULT
+    );
 
     try {
       await insuranceContract.subscribePolicy(
         this.state.shipId,
         this.state.shipmentValue,
-        (new Date(this.state.departureDate).getTime() / 1000),
-        (new Date(this.state.arrivalDate).getTime() / 1000),
+        new Date(this.state.departureDate).getTime() / 1000,
+        new Date(this.state.arrivalDate).getTime() / 1000,
         this.state.departurePort,
         this.state.arrivalPort,
         { value: insuredSum }
       );
-      window.alert("Transaction success!")
+      window.alert("Transaction success!");
     } catch (error) {
       if (error.code === ERROR_CODE_TX_REJECTED_BY_USER) {
-        console.log("User rejected the transaction.")
+        console.log("User rejected the transaction.");
         return;
       }
-      console.log(error)
+      console.log(error);
     }
   }
 }
