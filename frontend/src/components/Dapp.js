@@ -223,7 +223,7 @@ export class Dapp extends React.Component {
             type="button"
             className="btn btn-primary btn-success"
             onClick=
-            {() => this._checkPolicyStatus()}
+            {() => this._updatePolicyStatus()}
           >
             Update Policy Status
           </button>
@@ -372,7 +372,11 @@ export class Dapp extends React.Component {
         default: _policyStatus = "UNKNOWN";
       }
 
-      this.setState({ policyId: _policyId, policyStatus: _policyStatus });
+      if (_policyId == 0) {
+        window.alert("You don't have policy registered or it is still being created.")
+      } else {
+        this.setState({ policyId: _policyId, policyStatus: _policyStatus });
+      }
     } catch (error) {
       console.log(error)
       return;
