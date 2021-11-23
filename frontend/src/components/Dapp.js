@@ -29,7 +29,9 @@ export class Dapp extends React.Component {
       departurePort: "",
       departureDate: "",
       arrivalPort: "",
-      arrivalDate: ""
+      arrivalDate: "",
+      policyId: "",
+      policyStatus: ""
     };
 
     this.state = this.initialState;
@@ -56,19 +58,6 @@ export class Dapp extends React.Component {
           <div className="col-12">
             <h1>Chainlink Hackathon</h1>
           </div>
-        </div>
-
-        <hr />
-
-        <div className="form-group">
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick=
-            {(event) => this._subscribePolicy(event)}
-          >
-            subscribePolicy
-          </button>
         </div>
 
         <hr />
@@ -215,6 +204,31 @@ export class Dapp extends React.Component {
             )}
           </div>
         </div>
+
+        <hr />
+
+        <div className="form-group">
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick=
+            {(event) => this._subscribePolicy(event)}
+          >
+            Subscribe Policy
+          </button>
+        </div>
+
+        <div>
+          <button
+            type="button"
+            className="btn btn-primary btn-success"
+            onClick=
+            {() => this._updatePolicyStatus()}
+          >
+            Update Policy Status
+          </button>
+        </div>
+
       </div>
     );
   }
@@ -326,13 +340,46 @@ export class Dapp extends React.Component {
         this.state.arrivalPort,
         { value: insuredSum }
       );
+      
       window.alert("Transaction success!")
+
     } catch (error) {
       if (error.code === ERROR_CODE_TX_REJECTED_BY_USER) {
         console.log("User rejected the transaction.")
         return;
       }
       console.log(error)
+    }
+  }
+
+  async _updatePolicyStatus() {
+    try {
+      // This will return a Policy (in array format) if it exists on the blockchain side
+      const getPolicy = await insuranceContract.getPolicy();
+
+      // array index based on 'Policy' struct (smart contract code)
+      let _policyId = parseInt(getPolicy[0], 16); //hex number
+      let _policyStatusRaw = getPolicy[2][7];
+      let _policyStatus = "";
+
+      // array index based on 'PolicyStatus' enum (smart contract code)
+      switch (_policyStatusRaw) {
+        case 0: _policyStatus = "CREATED"; break;
+        case 1: _policyStatus = "RUNNING"; break;
+        case 2: _policyStatus = "COMPLETED"; break;
+        case 3: _policyStatus = "CLAIMED"; break;
+        case 4: _policyStatus = "PAIDOUT"; break;
+        default: _policyStatus = "UNKNOWN";
+      }
+
+      if (_policyId == 0) {
+        window.alert("You don't have policy registered or it is still being created.")
+      } else {
+        this.setState({ policyId: _policyId, policyStatus: _policyStatus });
+      }
+    } catch (error) {
+      console.log(error)
+      return;
     }
   }
 }
