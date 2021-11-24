@@ -12,6 +12,8 @@ import { TransactionErrorMessage } from "./TransactionErrorMessage";
 
 import "../index.css";
 
+import port_malaga from "../api/port_malaga.json";
+
 const HARDHAT_NETWORK_ID = "31337";
 
 const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
@@ -27,6 +29,7 @@ export class Dapp extends React.Component {
       networkError: undefined,
       shipId: "",
       shipmentValue: "",
+      departurePortObject: undefined,
       departurePort: "",
       departureDate: "",
       arrivalPort: "",
@@ -42,9 +45,23 @@ export class Dapp extends React.Component {
       "Access-Control-Allow-Origin": "*",
     };
 
-    axios
+    axios({
+      method: "get",
+      url: `https://api.datalastic.com/api/v0/vessel_inradius?api-key=XXX&lat=29.15915&lon=-89.25454&radius=10`,
+      withCredentials: false,
+      headers,
+    })
+      .then(function (response) {
+        // handle success
+        console.log(response);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+      }); */
+    /* axios
       .get(
-        "https://api.datalastic.com/api/v0/vessel_inradius?api-key=f9ff0ee8-5644-43e5-847d-39cbd67858e1&lat=29.15915&lon=-89.25454&radius=10",
+        "https://api.datalastic.com/api/v0/vessel_inradius?api-key=XXX&lat=29.15915&lon=-89.25454&radius=10",
         { headers }
       )
       .then(function (response) {
@@ -133,20 +150,64 @@ export class Dapp extends React.Component {
           <div className="form-row">
             <div className="col-sm-6">
               <label htmlFor="inputDeparturePort">Port of departure</label>
-              <input
-                type="text"
-                className="form-control"
-                id="inputDeparturePort"
-                aria-describedby="departurePortHelp"
-                placeholder="Port of departure"
-                value={this.state.departurePort}
-                onChange={(e) =>
-                  this.setState({ departurePort: e.target.value })
-                }
-              />
+              <div style={{ display: "flex" }}>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="inputDeparturePort"
+                  aria-describedby="departurePortHelp"
+                  placeholder="Port of departure"
+                  value={this.state.departurePort}
+                  onChange={(e) => {
+                    this.setState({ departurePort: e.target.value });
+                  }}
+                />
+                <button
+                  className={`btn ${
+                    this.state.departurePortObject
+                      ? "btn-primary"
+                      : "btn-secondary"
+                  }`}
+                  disabled={this.state.departurePortObject === undefined}
+                  onClick={() =>
+                    this.setState({
+                      departurePort: "",
+                      departurePortObject: undefined,
+                    })
+                  }
+                >
+                  x
+                </button>
+              </div>
               <small id="departurePortHelp" className="form-text text-muted">
-                Help Text
+                Type the port name and select one port
               </small>
+              <div>
+                {port_malaga.data
+                  .filter((port) => {
+                    return (
+                      port.port_name.includes(
+                        this.state.departurePort.toUpperCase()
+                      ) &&
+                      this.state.departurePort !== "" &&
+                      this.state.departurePortObject === undefined
+                    );
+                  })
+                  .map((port) => {
+                    return (
+                      <div
+                        onClick={() =>
+                          this.setState({
+                            departurePort: port.port_name,
+                            departurePortObject: port,
+                          })
+                        }
+                      >
+                        {port.port_name}
+                      </div>
+                    );
+                  })}
+              </div>
             </div>
 
             <div className="col-sm-6">
