@@ -1,21 +1,32 @@
-const contractAddr = process.env.CONTRACT_ADDRESS;
-const linkAddr = process.env.LINK_ADDRESS;
-
 async function main() {
+  const addr = process.env.CONTRACT_ADDRESS;
   const delayInsurance = await hre.ethers.getContractAt("DelayInsurance", addr);
 
+  /* Initialise protocols functions */
 
+  //TO DO : UPGRADE NONCE MANNUALY TO SEND ALL TRANSACTIONS SUCCESFULLY.
 
+  // Set weather oracle datas
+  const oracleAddr = process.env.ORACLE_ADDRESS;
+  const jobId = process.env.JOB_ID;
+  const fee = process.env.JOB_FEE;
+  await delayInsurance.setWeatherOracle(oracleAddr, jobId, fee);
+  console.log("Oracle address set to : " + oracleAddr);
+  console.log("Job Id set to : " + jobId);
+  console.log("Fees set to : " + fee);
 
+  // Set the incident threshold
+  const incidentsThreshold = 1
+  await delayInsurance.setIncidentThreshold(incidentsThreshold);
+  console.log("Incident threshold set to : " + incidentsThreshold);
 
+  // Set update timer in seconds (1 hour = 60 * 60)
+  const updateTimer = 60*60;
+  await delayInsurance.setUpdateTimer(updateTimer);
+  console.log("Keeper update timer set to : " + updateTimer);
 
-  await tx.wait(); // mined
-
-  await consumer.requestVolumeData();
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
 main()
   .then(() => process.exit(0))
   .catch((error) => {

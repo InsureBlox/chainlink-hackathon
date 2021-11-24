@@ -38,11 +38,6 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         PolicyStatus status;
     }
 
-    struct TrackingData {
-        uint256 requestId;
-        Coordinate location;
-    }
-
     struct WeatherData {
         uint256 requestId;
         Coordinate location;
@@ -84,9 +79,6 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
     address public weatherOracle;
     bytes32 public weatherJobId;
     uint256 public weatherFee;
-    address public trackingOracle;
-    bytes32 public trackingJobId;
-    uint256 public trackingFee;
     uint8 public incidentsThreshold; // Threshold for triggering claiming process
 
     // Prevents a function being run unless it's called by Insurance Provider
@@ -119,7 +111,7 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         Ship memory ship = Ship({
             id: _shipId,
             shipmentValue: _shipmentValue
-          });
+        });
 
         uint256 _premium = pricePremium(
             ship,
@@ -170,6 +162,8 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         policyId++;
     }
 
+    /**********  GET FUNCTIONS **********/
+
     function getPolicy() public view returns (Policy memory) {
         return policies[msg.sender];
     }
@@ -194,26 +188,42 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         return allPolicies;
     }
 
-    /**********  PROTOCOL FUNCTIONS **********/
+    function getOracleDetails() public view returns (address, bytes32, uint256) {
+        return (weatherOracle, weatherJobId, weatherFee);
+    }
+
+    function getIncidentThreshold() public view returns (uint) {
+        return incidentsThreshold;
+    }
+
+    function getUpdateTimer() public view returns (uint) {
+        return updateTimer;
+    }
+
+    /**********  SET FUNCTIONS **********/
 
     // Set up weather oracle datas
     function setWeatherOracle(
         address _oracleAddress,
-        bytes32 _jobId,
+        string memory _jobId,
         uint256 _fee
     ) public onlyOwner {
         weatherOracle = _oracleAddress; // address :
-        weatherJobId = _jobId; // jobId  :
+        weatherJobId = stringToBytes32(_jobId); // jobId  :
         weatherFee = _fee; // fees : X.X LINK
     }
 
     // Set up incident threshold
     function setIncidentThreshold(uint8 _incidentsThreshold) public onlyOwner {
-      incidentsThreshold = _incidentsThreshold;
+        incidentsThreshold = _incidentsThreshold;
     }
 
     function setUpdateTimer(uint256 _updateTimer) public onlyOwner {
-      updateTimer = _updateTimer;
+        updateTimer = _updateTimer;
+    }
+
+    function setPolicyThreshold(address _beneficiary, uint256 _gustThreshold) public onlyOwner returns(uint256){
+        policies[_beneficiary].coverage.gustThreshold = _gustThreshold;
     }
 
     /**********  PRICING FUNCTIONS **********/
@@ -242,10 +252,10 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
     /**********  CHAINLINK KEEPER FUNCTIONS **********/
 
     function checkUpkeep(bytes calldata /* checkData */)
-      external
-      override
-      returns (bool upkeepNeeded, bytes memory /* performData */) {
-        upkeepNeeded = (block.timestamp - lastTimeStamp) > updateTimer;
+        external
+        override
+        returns (bool upkeepNeeded, bytes memory /* performData */) {
+            upkeepNeeded = (block.timestamp - lastTimeStamp) > updateTimer;
     }
 
     function performUpkeep(bytes calldata /* performData */) external override {
@@ -257,74 +267,80 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
 
     // TODO make this function internal
     function UpdateContracts() public onlyOwner {
-      for (
-          uint256 policiesIndex = 0;
-          policiesIndex < addrPolicies.length;
-          policiesIndex++
-      ) {
-          address addr = addrPolicies[policiesIndex];
-          Policy memory policy = policies[addr];
+        for (uint256 policiesIndex = 0; policiesIndex < addrPolicies.length; policiesIndex++) {
+            address addr = addrPolicies[policiesIndex];
+            Policy memory policy = policies[addr];
 
-            // Update all policies status
-          if (policy.coverage.startDate >= block.timestamp && policy.coverage.endDate < block.timestamp) {
-            policy.coverage.status = PolicyStatus.RUNNING;
-          } else if (policy.coverage.endDate >= block.timestamp) {
-            policy.coverage.status = PolicyStatus.COMPLETED;
-          }
+              // Update all policies status
+            if (policy.coverage.startDate >= block.timestamp && policy.coverage.endDate < block.timestamp) {
+              policy.coverage.status = PolicyStatus.RUNNING;
+            } else if (policy.coverage.endDate >= block.timestamp) {
+              policy.coverage.status = PolicyStatus.COMPLETED;
+            }
 
-          if (policy.coverage.status == PolicyStatus.RUNNING) {
-            // Request weather data to Chainlink
-            Chainlink.Request memory request = buildChainlinkRequest(weatherJobId, address(this), this.receiveWeatherData.selector);
-            // Request datas from API : coordinate(lat, lng) and gust
-            // TO DO
-            request.add("gust", "");
-            // Sends the request
-            bytes32 requestId = sendChainlinkRequestTo(weatherOracle, request, weatherFee);
-            requestToPolicyAddr[requestId] = addr;
-          } else if (policy.coverage.status == PolicyStatus.CLAIMED) {
-            payOut(addr);
-          }
-
-      }
+            if (policy.coverage.status == PolicyStatus.RUNNING) {
+              // Request weather data to Chainlink
+              Chainlink.Request memory request = buildChainlinkRequest(weatherJobId, address(this), this.receiveWeatherData.selector);
+              // Request datas from API : coordinate(lat, lng) and gust
+              // TO DO
+              request.add("gust", "");
+              // Sends the request
+              bytes32 requestId = sendChainlinkRequestTo(weatherOracle, request, weatherFee);
+              requestToPolicyAddr[requestId] = addr;
+            } else if (policy.coverage.status == PolicyStatus.CLAIMED) {
+              payOut(addr);
+            }
+        }
     }
 
     function receiveWeatherData(bytes32 _requestId, uint256 _gust) public recordChainlinkFulfillment(_requestId) {
         Policy storage policy = policies[requestToPolicyAddr[_requestId]];
-      address addr = requestToPolicyAddr[_requestId];
-      policy.weatherData.gust = _gust;
-      // remove current requestId from requestToPolicyAddr list
-      delete requestToPolicyAddr[_requestId];
-      // Check if the policy has an incident
-      if (hasIncident(addr)) {
-        // Update number of incidents
-        policy.incidents++;
-
-        emit IncidentReported(addr, policy.incidents);
-      }
-
-      if (policy.incidents >= incidentsThreshold /* + Should be at end port? */) {
-        policy.coverage.status = PolicyStatus.CLAIMED;
-      }
+        address addr = requestToPolicyAddr[_requestId];
+        policy.weatherData.gust = _gust;
+        // remove current requestId from requestToPolicyAddr list
+        delete requestToPolicyAddr[_requestId];
+        // Check if the policy has an incident
+        if (hasIncident(addr)) {
+            // Update number of incidents
+            policy.incidents++;
+            emit IncidentReported(addr, policy.incidents);
+        }
+        if (policy.incidents >= incidentsThreshold /* + Should be at end port? */) {
+            policy.coverage.status = PolicyStatus.CLAIMED;
+        }
     }
 
     // Check if the gust is above the threshold
     function hasIncident(address _beneficiary) public returns (bool) {
-      Policy memory policy = policies[_beneficiary];
-      // Trigger claiming process using pre determined threshold
-      if (policy.weatherData.gust > policy.coverage.gustThreshold) {
-        policy.coverage.status = PolicyStatus.CLAIMED;
-        return true;
-      }
+        Policy memory policy = policies[_beneficiary];
+        // Trigger claiming process using pre determined threshold
+        if (policy.weatherData.gust > policy.coverage.gustThreshold) {
+            policy.coverage.status = PolicyStatus.CLAIMED;
+            return true;
+        }
     }
 
     function payOut(address _beneficiary) public payable onlyOwner {
-      // transfer funds to beneficiary
-      Policy memory policy = policies[_beneficiary];
-      (bool sent, bytes memory data) = _beneficiary.call{value: 10}("");
-      require(sent, "Failed to transfer insurance claim");
-      // Set contract to PAIDOUT
-      policy.coverage.status = PolicyStatus.PAIDOUT;
-      emit PolicyPaidOut(_beneficiary, policy.policyId, policy.ship.shipmentValue);
+        // transfer funds to beneficiary
+        Policy memory policy = policies[_beneficiary];
+        (bool sent, bytes memory data) = _beneficiary.call{value: 10}("");
+        require(sent, "Failed to transfer insurance claim");
+        // Set contract to PAIDOUT
+        policy.coverage.status = PolicyStatus.PAIDOUT;
+        emit PolicyPaidOut(_beneficiary, policy.policyId, policy.ship.shipmentValue);
+    }
+
+    // FORMAT FUNCTIONS
+
+    function stringToBytes32(string memory source) private pure returns (bytes32 result) {
+        bytes memory tempEmptyStringTest = bytes(source);
+        if (tempEmptyStringTest.length == 0) {
+          return 0x0;
+        }
+
+        assembly { // solhint-disable-line no-inline-assembly
+          result := mload(add(source, 32))
+        }
     }
 
 }
