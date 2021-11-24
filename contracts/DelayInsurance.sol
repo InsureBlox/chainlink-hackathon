@@ -92,7 +92,6 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
 
     constructor() public {
         admin = msg.sender;
-        updateTimer = 60; // Keepers will update data every 60secs
         // Error on tests -> Transaction reverted: function call to a non-contract account
         //setPublicChainlinkToken();
     }
