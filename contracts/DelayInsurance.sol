@@ -341,5 +341,4 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
           result := mload(add(source, 32))
         }
     }
-
 }
