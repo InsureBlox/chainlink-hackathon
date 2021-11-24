@@ -13,6 +13,7 @@ import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import "../index.css";
 
 import port_malaga from "../api/port_malaga.json";
+import vessels from "../api/vessels.json";
 
 const HARDHAT_NETWORK_ID = "31337";
 
@@ -27,6 +28,8 @@ export class Dapp extends React.Component {
       selectedAddress: undefined,
       transactionError: undefined,
       networkError: undefined,
+      shipObject: undefined,
+      shipName: "",
       shipId: "",
       shipmentValue: "",
       departurePortObject: undefined,
@@ -112,6 +115,65 @@ export class Dapp extends React.Component {
         <hr />
 
         <div className="form-group">
+          <div className="form-row">
+            <div className="col-sm-6">
+              <label htmlFor="inputShipName">Ship Name</label>
+              <div style={{ display: "flex" }}>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="inputShipName"
+                  aria-describedby="shipNameHelp"
+                  placeholder="Ship Name"
+                  value={this.state.shipName}
+                  onChange={(e) => this.setState({ shipName: e.target.value })}
+                />
+                <button
+                  className={`btn ${
+                    this.state.shipObject ? "btn-primary" : "btn-secondary"
+                  }`}
+                  disabled={this.state.shipObject === undefined}
+                  onClick={() =>
+                    this.setState({
+                      shipName: "",
+                      shipObject: undefined,
+                    })
+                  }
+                >
+                  x
+                </button>
+              </div>
+
+              <small id="shipNameHelp" className="form-text text-muted">
+                Search for a vessel and select it
+              </small>
+              <div>
+                {vessels.data.vessels
+                  .filter((vessel) => {
+                    return (
+                      vessel.name.includes(this.state.shipName.toUpperCase()) &&
+                      this.state.shipName !== "" &&
+                      this.state.shipObject === undefined
+                    );
+                  })
+                  .map((vessel) => {
+                    return (
+                      <div
+                        onClick={() =>
+                          this.setState({
+                            shipName: vessel.name,
+                            shipId: vessel.uuid,
+                            shipObject: vessel,
+                          })
+                        }
+                      >
+                        {vessel.name}
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          </div>
           <div className="form-row">
             <div className="col-sm-6">
               <label htmlFor="inputShipId">Ship Id</label>
