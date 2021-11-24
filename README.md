@@ -1,6 +1,6 @@
 # Ocean Storm by InsureBlox
 
-Ocean Storm is a parametric insurance solution ☂ for ships 🚢 going through rough seas 🌊 based on Blockchain 🚀, i.e. hazzle-free, automatic pay-outs in case of adverse weather events.
+Ocean Storm is a parametric insurance solution ☂&nbsp;&nbsp;for ships 🚢 &nbsp;&nbsp;going through rough seas 🌊 &nbsp;&nbsp;based on Blockchain 🚀&nbsp;&nbsp;i.e. hazzle-free, automatic pay-outs in case of adverse weather events.
 
 ### Get started
 
@@ -51,6 +51,10 @@ cd frontend
 npm install
 npm start
 ```
+
+### External Adapter
+
+Refer to [Datalistic / Storm Glass External Adapter](https://github.com/InsureBlox/Datalistic_StormGlass_EA_chainlink)
 
 ### Test
 
