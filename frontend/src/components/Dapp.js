@@ -57,7 +57,7 @@ export class Dapp extends React.Component {
       <div className="container p-4">
         <div className="row">
           <div className="col-12">
-            <h1>Chainlink Hackathon</h1>
+            <h1>Ocean Storm by InsureBlox</h1>
           </div>
         </div>
 

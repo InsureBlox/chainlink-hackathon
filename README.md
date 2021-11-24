@@ -1,6 +1,6 @@
-# Basic Sample Hardhat Project
+# Ocean Storm by InsureBlox
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+Ocean Storm is a parametric insurance solution ☂ for ships 🚢 going through rough seas 🌊 based on Blockchain 🚀, i.e. hazzle-free, automatic pay-outs in case of adverse weather events.
 
 ### Get started
 
