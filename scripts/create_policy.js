@@ -3,7 +3,7 @@ async function main() {
   const delayInsurance = await hre.ethers.getContractAt("DelayInsurance", addr);
 
   // Create insurance policy
-  const shipId = "b8625b67-7142-cfd1-7b85-595cebfe4191"
+  const shipId = "b8625b67-7142-cfd1-7b85-595cebfe4191";
   await delayInsurance.subscribePolicy(
     shipId,
     100,
