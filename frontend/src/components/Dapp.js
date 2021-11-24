@@ -12,6 +12,7 @@ import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import "../index.css";
 
 const HARDHAT_NETWORK_ID = "31337";
+const KOVAN_NETWORK_ID = "42";
 
 const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
 let insuranceContract
@@ -302,12 +303,13 @@ export class Dapp extends React.Component {
   }
 
   _checkNetwork() {
-    if (window.ethereum.networkVersion === HARDHAT_NETWORK_ID) {
+    const KOVAN_NETWORK_ID = "42";
+    if (window.ethereum.networkVersion === HARDHAT_NETWORK_ID || window.ethereum.networkVersion === KOVAN_NETWORK_ID) {
       return true;
     }
 
     this.setState({
-      networkError: "Please connect Metamask to Localhost:8545",
+      networkError: "Please connect Metamask to Localhost:8545 or Kovan network.",
     });
 
     return false;
@@ -340,7 +342,7 @@ export class Dapp extends React.Component {
         this.state.arrivalPort,
         { value: insuredSum }
       );
-      
+
       window.alert("Transaction success!")
 
     } catch (error) {
