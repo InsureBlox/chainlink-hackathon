@@ -321,9 +321,11 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
 
     function payOut(address _beneficiary) public payable onlyOwner {
         // transfer funds to beneficiary
-        Policy memory policy = policies[_beneficiary];
-        (bool sent, bytes memory data) = _beneficiary.call{value: 10}("");
-        require(sent, "Failed to transfer insurance claim");
+        Policy storage policy = policies[_beneficiary];
+        //(bool sent, bytes memory data) = _beneficiary.call{value: policy.ship.shipmentValue}("");
+        //require(sent, "Failed to transfer insurance claim");
+        require(address(this).balance >= policy.ship.shipmentValue);
+        payable(_beneficiary).transfer(policy.ship.shipmentValue);
         // Set contract to PAIDOUT
         policy.coverage.status = PolicyStatus.PAIDOUT;
         emit PolicyPaidOut(_beneficiary, policy.policyId, policy.ship.shipmentValue);

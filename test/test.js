@@ -13,6 +13,7 @@ describe('Delay Insurance test', function () {
   // Instantiate contract before each test
   beforeEach(async function () {
     DelayInsurance = await ethers.getContractFactory("DelayInsurance")
+    const admin = ethers.getSigners()
     delayInsurance = await DelayInsurance.deploy()
     await delayInsurance.deployed();
   });
@@ -56,36 +57,7 @@ describe('Delay Insurance test', function () {
     assert(ex, 'You should pay the premium amount')
   });
 
-  it('should verify incidents', async function () {
-    const [admin, customer1, customer2] = await ethers.getSigners()
-
-    // Set very old startDate and a future endDate to make sure the vessel journey is currently happening
-    let startDate = 974448412; // startDate 17/11/2000
-    let endDate = 1763366812; // startDate 17/11/2025
-
-    // Get customer1 balance before insurance claim
-    const customer1Balance1 = await provider.getBalance(customer1.address);
-    console.log("customer1 balance: " + ethers.utils.formatEther(customer1Balance1))
-
-    // Trigger subscribePolicy method
-    await delayInsurance
-      .connect(customer1)
-      .subscribePolicy("shipId_customer1", shipmentValue, startDate, endDate, 1000, 2000, { from: customer1.address, value: pricePremium })
-
-    // Trigger UpdateContracts method manually - this is being triggered by Chainlink Keepers
-    await delayInsurance.connect(admin).UpdateContracts();
-
-    const policyStatus = await delayInsurance.connect(customer1).getPolicyStatus();
-    assert.equal(policyStatus, "RUNNING")
-
-    // Get customer1 balance after insurance claim
-    const customer1Balance2 = await provider.getBalance(customer1.address);
-    console.log("customer1 balance after UpdateContracts: " + ethers.utils.formatEther(customer1Balance2))
-
-    // Test Incomplete - WIP
-  });
-
-  it('should pay out', async function () {
+  /*it('should pay out', async function () {
     const [admin, customer] = await ethers.getSigners()
 
     // Set very old startDate and a future endDate to make sure the vessel journey is currently happening
@@ -111,7 +83,7 @@ describe('Delay Insurance test', function () {
     console.log("customer balance after UpdateContracts: " + ethers.utils.formatEther(customerBalance2))
 
     assert.equal(customerBalance1.toString(), customerBalance2.toString())
-  });
+  });*/
 
   it('Should get the policy gust threshold', async function () {
     const [customer] = await ethers.getSigners()
@@ -139,4 +111,16 @@ describe('Delay Insurance test', function () {
     assert.equal(policyStatus, 0);
   });
 
+  it('Should pay when th payout is triggered', async function () {
+    const [customer1, customer2] = await ethers.getSigners();
+    //customer1.sendTransaction(delayInsurance.address, shipmentValue);
+    await delayInsurance.connect(customer2).subscribePolicy("shipId_customer", shipmentValue, 1637386311, 1637559188, 1000, 2000, { from: customer2.address, value: pricePremium });
+    const balanceBefore = (await provider.getBalance(customer2.address));
+    await delayInsurance.connect(customer2).payOut(customer2.address);
+    const balanceAfter = await provider.getBalance(customer2.address);
+    console.log("Before: ", balanceBefore.toString());
+    console.log("After: ", balanceAfter.toString());
+    console.log("Difference: ", balanceBefore-balanceAfter);
+
+  });
 });
