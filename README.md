@@ -1,6 +1,6 @@
-# Basic Sample Hardhat Project
+# Ocean Storm by InsureBlox
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+Ocean Storm is a parametric insurance solution ☂&nbsp;&nbsp;for ships 🚢 &nbsp;&nbsp;going through rough seas 🌊 &nbsp;&nbsp;based on Blockchain 🚀&nbsp;&nbsp;i.e. hazzle-free, automatic pay-outs in case of adverse weather events.
 
 ### Get started
 
@@ -15,10 +15,6 @@ ALCHEMY_API_KEY = XXXXXXXXXX
 PRIVATE_KEY = XXXXXXXX
 ```
 
-1. npx hardhat node
-2. npx hardhat run scripts/deploy.js --network kovan
-3. cd frontend && npm run start
-
 Try running some of the following tasks:
 
 ```shell
@@ -31,19 +27,11 @@ node scripts/sample-script.js
 npx hardhat help
 ```
 
-### Test
-
-Run the following command to perform the unit tests:
-`npx hardhat test`
-
-### Test coverage
-
-`npx hardhat coverage`
-
 ### Running locally
 
-`npx hardhat node` or `npx hardhat node --hostname 127.0.0.1`
-`npx hardhat run scripts/deploy.js --network localhost`
+1. `npx hardhat node` or `npx hardhat node --hostname 127.0.0.1`
+2. `npx hardhat run scripts/deploy.js --network localhost`
+
 > ℹ️  Connect metamask to Localhost:8545: RPC URL: http://localhost:8545 | Chain ID: 31337
 
 ### Deploy
@@ -63,3 +51,16 @@ cd frontend
 npm install
 npm start
 ```
+
+### External Adapter
+
+Refer to [Datalistic / Storm Glass External Adapter](https://github.com/InsureBlox/Datalistic_StormGlass_EA_chainlink)
+
+### Test
+
+Run the following command to perform the unit tests:
+`npx hardhat test`
+
+**Test coverage**
+
+`npx hardhat coverage`
