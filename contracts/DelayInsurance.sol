@@ -225,6 +225,7 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         policies[_beneficiary].coverage.gustThreshold = _gustThreshold;
     }
 
+
     /**********  PRICING FUNCTIONS **********/
 
     // Calculate the premium

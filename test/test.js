@@ -134,11 +134,9 @@ describe('Delay Insurance test', function () {
     await delayInsurance
       .connect(customer)
       .subscribePolicy("shipId_customer", shipmentValue, 1637386311, 1637559188, 1000, 2000, { from: customer.address, value: pricePremium })
-
-    console.log(await delayInsurance.connect(customer).getPolicyStatus());
+    
     const policyStatus = await delayInsurance.connect(customer).getPolicyStatus();
-
-    assert.equal(policyStatus, "CREATED");
+    assert.equal(policyStatus, 0);
   });
 
 });
