@@ -12,7 +12,7 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
     enum PolicyStatus {
         CREATED, // Policy is subscribed
         RUNNING, // Policy cover is started
-        COMPLETED, // Policy cover is finished without claim
+        COMPLETED, // Policy cover is fin6ished without claim
         CLAIMED, // Policy is claimed, waiting for pay out
         PAIDOUT // Claim is paid out
     }
@@ -166,6 +166,19 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
     function getPolicy() public view returns (Policy memory) {
         return policies[msg.sender];
     }
+     uint utest;
+     function getTest() public view returns (uint256) {
+         return utest;
+     }
+
+    function getDate() public view returns (uint256) {
+        return policies[msg.sender].coverage.startDate;
+    }
+
+     uint ublock;
+     function getBlock() public view returns (uint256) {
+         return ublock;
+     }
 
     function getGustThreshold() public view returns (uint256) {
         return policies[msg.sender].coverage.gustThreshold;
@@ -265,15 +278,15 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
     /**********  CLAIMS FUNCTIONS **********/
 
     // TODO make this function internal
-    function UpdateContracts() public onlyOwner {
+    function UpdateContracts() public {
         for (uint256 policiesIndex = 0; policiesIndex < addrPolicies.length; policiesIndex++) {
             address addr = addrPolicies[policiesIndex];
-            Policy memory policy = policies[addr];
+            Policy storage policy = policies[addr];
 
-              // Update all policies status
-            if (policy.coverage.startDate >= block.timestamp && policy.coverage.endDate < block.timestamp) {
+            // Update all policies status
+            if (policy.coverage.startDate <= block.timestamp && policy.coverage.endDate >= block.timestamp) {
               policy.coverage.status = PolicyStatus.RUNNING;
-            } else if (policy.coverage.endDate >= block.timestamp) {
+            } else if (policy.coverage.endDate < block.timestamp) {
               policy.coverage.status = PolicyStatus.COMPLETED;
             }
 
@@ -314,12 +327,11 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         Policy memory policy = policies[_beneficiary];
         // Trigger claiming process using pre determined threshold
         if (policy.weatherData.gust > policy.coverage.gustThreshold) {
-            policy.coverage.status = PolicyStatus.CLAIMED;
             return true;
         }
     }
 
-    function payOut(address _beneficiary) public payable onlyOwner {
+    function payOut(address _beneficiary) public payable {
         // transfer funds to beneficiary
         Policy storage policy = policies[_beneficiary];
         //(bool sent, bytes memory data) = _beneficiary.call{value: policy.ship.shipmentValue}("");
