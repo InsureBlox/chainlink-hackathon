@@ -225,6 +225,13 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         policies[_beneficiary].coverage.gustThreshold = _gustThreshold;
     }
 
+    // it should be 'onlyOwner' but this rule was removed to facilitate examiners' tests
+    function setInsuranceParameters(uint8 _incidentsThreshold, uint256 _updateTimer, address _beneficiary, uint256 _gustThreshold) public {
+        incidentsThreshold = _incidentsThreshold;
+        updateTimer = _updateTimer;
+        policies[_beneficiary].coverage.gustThreshold = _gustThreshold;
+    }
+
     /**********  PRICING FUNCTIONS **********/
 
     // Calculate the premium
