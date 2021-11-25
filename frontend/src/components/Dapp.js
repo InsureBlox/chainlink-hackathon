@@ -12,7 +12,7 @@ import { TransactionErrorMessage } from "./TransactionErrorMessage";
 
 import "../index.css";
 
-import port_malaga from "../api/port_malaga.json";
+import ports from "../api/ports.json";
 import vessels from "../api/vessels.json";
 
 const HARDHAT_NETWORK_ID = "31337";
@@ -129,7 +129,11 @@ export class Dapp extends React.Component {
                   aria-describedby="shipNameHelp"
                   placeholder="Ship Name"
                   value={this.state.shipName}
-                  onChange={(e) => !this.state.shipObject ? this.setState({ shipName: e.target.value }) : null}
+                  onChange={(e) =>
+                    !this.state.shipObject
+                      ? this.setState({ shipName: e.target.value })
+                      : null
+                  }
                 />
                 <button
                   className={`btn ${
@@ -162,7 +166,7 @@ export class Dapp extends React.Component {
                   .map((vessel) => {
                     return (
                       <div
-                      className="dropdown-item"
+                        className="dropdown-item"
                         onClick={() =>
                           this.setState({
                             shipName: vessel.name,
@@ -224,7 +228,11 @@ export class Dapp extends React.Component {
                   aria-describedby="departurePortHelp"
                   placeholder="Port of departure"
                   value={this.state.departurePort}
-                  onChange={(e) => !this.state.departurePortObject ? this.setState({ departurePort: e.target.value }) : null}
+                  onChange={(e) =>
+                    !this.state.departurePortObject
+                      ? this.setState({ departurePort: e.target.value })
+                      : null
+                  }
                 />
                 <button
                   className={`btn ${
@@ -247,7 +255,7 @@ export class Dapp extends React.Component {
                 Type the port name and select one port
               </small>
               <div>
-                {port_malaga.data
+                {ports.data
                   .filter((port) => {
                     return (
                       port.port_name.includes(
@@ -260,7 +268,7 @@ export class Dapp extends React.Component {
                   .map((port) => {
                     return (
                       <div
-                      className="dropdown-item"
+                        className="dropdown-item"
                         onClick={() =>
                           this.setState({
                             departurePort: port.port_name,
@@ -310,7 +318,9 @@ export class Dapp extends React.Component {
                   placeholder="Port of arrival"
                   value={this.state.arrivalPort}
                   onChange={(e) =>
-                    !this.state.arrivalPortObject ? this.setState({ arrivalPort: e.target.value }) : null
+                    !this.state.arrivalPortObject
+                      ? this.setState({ arrivalPort: e.target.value })
+                      : null
                   }
                 />
                 <button
@@ -329,36 +339,36 @@ export class Dapp extends React.Component {
                 >
                   x
                 </button>
-                </div>
-                <small id="departurePortHelp" className="form-text text-muted">
-                  Type the port name and select one port
-                </small>
-                <div>
-                  {port_malaga.data
-                    .filter((port) => {
-                      return (
-                        port.port_name.includes(
-                          this.state.arrivalPort.toUpperCase()
-                        ) &&
-                        this.state.arrivalPort !== "" &&
-                        !this.state.arrivalPortObject
-                      );
-                    })
-                    .map((port) => {
-                      return (
-                        <div
-                          className="dropdown-item"
-                          onClick={() =>
-                            this.setState({
-                              arrivalPort: port.port_name,
-                              arrivalPortObject: port,
-                            })
-                          }
-                        >
-                          {port.port_name}
-                        </div>
-                      );
-                    })}
+              </div>
+              <small id="departurePortHelp" className="form-text text-muted">
+                Type the port name and select one port
+              </small>
+              <div>
+                {ports.data
+                  .filter((port) => {
+                    return (
+                      port.port_name.includes(
+                        this.state.arrivalPort.toUpperCase()
+                      ) &&
+                      this.state.arrivalPort !== "" &&
+                      !this.state.arrivalPortObject
+                    );
+                  })
+                  .map((port) => {
+                    return (
+                      <div
+                        className="dropdown-item"
+                        onClick={() =>
+                          this.setState({
+                            arrivalPort: port.port_name,
+                            arrivalPortObject: port,
+                          })
+                        }
+                      >
+                        {port.port_name}
+                      </div>
+                    );
+                  })}
               </div>
             </div>
 
