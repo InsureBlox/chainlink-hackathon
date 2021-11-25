@@ -25,6 +25,9 @@ export class Dapp extends React.Component {
       selectedAddress: undefined,
       transactionError: undefined,
       networkError: undefined,
+      policyThreshold: 1,
+      incidentsThreshold: 2,
+      keepersInterval: 60,
       shipId: "",
       shipmentValue: "",
       departurePort: "",
@@ -57,7 +60,68 @@ export class Dapp extends React.Component {
       <div className="container p-4">
         <div className="row">
           <div className="col-12">
-            <h1>Ocean Storm by InsureBlox</h1>
+            <h1>⛈️ Ocean Storm by InsureBlox</h1>
+          </div>
+        </div>
+
+        <hr />
+
+        <div className="row">
+          <div className="col-12">
+            <h4>Insurance Parameters</h4>
+
+            <div className="row">
+              <div className="col-sm-4">
+                <label htmlFor="inputPolicyThreshold">Policy Threshold</label>
+                <input
+                  type="number"
+                  min="0"
+                  className="form-control"
+                  id="inputPolicyThreshold"
+                  value={this.state.policyThreshold}
+                  onChange={(e) => this.setState({ policyThreshold: e.target.value })}
+                />
+              </div>
+
+              <div className="col-sm-4">
+                <label htmlFor="inputIncidentsThreshold">Incidents Threshold</label>
+                <input
+                  type="number"
+                  min="0"
+                  className="form-control"
+                  id="inputIncidentsThreshold"
+                  value={this.state.incidentsThreshold}
+                  onChange={(e) => this.setState({ incidentsThreshold: e.target.value })}
+                />
+              </div>
+
+              <div className="col-sm-4">
+                <label htmlFor="inputKeepersInterval">Keepers Interval</label>
+                <input
+                  type="number"
+                  min="0"
+                  className="form-control"
+                  id="inputKeepersInterval"
+                  aria-describedby="keepersIntervalHelp"
+                  value={this.state.keepersInterval}
+                  onChange={(e) => this.setState({ keepersInterval: e.target.value })}
+                />
+                <small id="keepersIntervalHelp" className="form-text text-muted">
+                  In seconds
+                </small>
+              </div>
+
+            </div>
+
+            <button
+            type="button"
+            className="btn btn-info"
+            onClick=
+            {() => this._updateParameters()}
+          >
+            Update Parameters
+          </button>
+
           </div>
         </div>
 
@@ -180,6 +244,17 @@ export class Dapp extends React.Component {
           </div>
         </div>
 
+        <div className="row">
+          <div className="col-12">
+            {this.state.transactionError && (
+              <TransactionErrorMessage
+                message={this._getRpcErrorMessage(this.state.transactionError)}
+                dismiss={() => this._dismissTransactionError()}
+              />
+            )}
+          </div>
+        </div>
+
         <div>State</div>
         {this.state.departureDate && (
           <div>
@@ -194,17 +269,6 @@ export class Dapp extends React.Component {
           </div>
         )}
         <div className="word-break">{JSON.stringify(this.state)}</div>
-
-        <div className="row">
-          <div className="col-12">
-            {this.state.transactionError && (
-              <TransactionErrorMessage
-                message={this._getRpcErrorMessage(this.state.transactionError)}
-                dismiss={() => this._dismissTransactionError()}
-              />
-            )}
-          </div>
-        </div>
 
         <hr />
 
@@ -303,7 +367,6 @@ export class Dapp extends React.Component {
   }
 
   _checkNetwork() {
-    const KOVAN_NETWORK_ID = "42";
     if (window.ethereum.networkVersion === HARDHAT_NETWORK_ID || window.ethereum.networkVersion === KOVAN_NETWORK_ID) {
       return true;
     }
@@ -343,11 +406,12 @@ export class Dapp extends React.Component {
         { value: insuredSum }
       );
 
+      // TODO improve UX
       window.alert("Transaction success!")
 
     } catch (error) {
       if (error.code === ERROR_CODE_TX_REJECTED_BY_USER) {
-        console.log("User rejected the transaction.")
+        this.setState({ transactionError: "User rejected the transaction." });
         return;
       }
       console.log(error)
@@ -381,7 +445,23 @@ export class Dapp extends React.Component {
       }
     } catch (error) {
       console.log(error)
+      this.setState({ transactionError: error });
       return;
     }
+  }
+
+  async _updateParameters() {
+    try {
+      insuranceContract.setInsuranceParameters(
+        this.state.incidentsThreshold,
+        this.state.keepersInterval,
+        this.state.selectedAddress,
+        this.state.policyThreshold
+      );
+    } catch (error) {
+      console.log(error)
+      this.setState({ transactionError: error });
+      return;
+    } 
   }
 }
