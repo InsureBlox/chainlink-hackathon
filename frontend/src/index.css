@@ -5,3 +5,8 @@
 .word-break {
   word-break: break-all;
 }
+
+.dropdown-item:hover {
+  cursor: pointer;
+  background-color: lightskyblue;
+}

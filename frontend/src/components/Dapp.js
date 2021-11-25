@@ -39,7 +39,7 @@ export class Dapp extends React.Component {
       arrivalPort: "",
       arrivalDate: "",
       policyId: "",
-      policyStatus: ""
+      policyStatus: "",
     };
 
     this.state = this.initialState;
@@ -129,13 +129,13 @@ export class Dapp extends React.Component {
                   aria-describedby="shipNameHelp"
                   placeholder="Ship Name"
                   value={this.state.shipName}
-                  onChange={(e) => this.setState({ shipName: e.target.value })}
+                  onChange={(e) => !this.state.shipObject ? this.setState({ shipName: e.target.value }) : null}
                 />
                 <button
                   className={`btn ${
                     this.state.shipObject ? "btn-primary" : "btn-secondary"
                   }`}
-                  disabled={this.state.shipObject === undefined}
+                  disabled={!this.state.shipObject}
                   onClick={() =>
                     this.setState({
                       shipName: "",
@@ -156,12 +156,13 @@ export class Dapp extends React.Component {
                     return (
                       vessel.name.includes(this.state.shipName.toUpperCase()) &&
                       this.state.shipName !== "" &&
-                      this.state.shipObject === undefined
+                      !this.state.shipObject
                     );
                   })
                   .map((vessel) => {
                     return (
                       <div
+                      className="dropdown-item"
                         onClick={() =>
                           this.setState({
                             shipName: vessel.name,
@@ -223,9 +224,7 @@ export class Dapp extends React.Component {
                   aria-describedby="departurePortHelp"
                   placeholder="Port of departure"
                   value={this.state.departurePort}
-                  onChange={(e) => {
-                    this.setState({ departurePort: e.target.value });
-                  }}
+                  onChange={(e) => !this.state.departurePortObject ? this.setState({ departurePort: e.target.value }) : null}
                 />
                 <button
                   className={`btn ${
@@ -233,7 +232,7 @@ export class Dapp extends React.Component {
                       ? "btn-primary"
                       : "btn-secondary"
                   }`}
-                  disabled={this.state.departurePortObject === undefined}
+                  disabled={!this.state.departurePortObject}
                   onClick={() =>
                     this.setState({
                       departurePort: "",
@@ -255,12 +254,13 @@ export class Dapp extends React.Component {
                         this.state.departurePort.toUpperCase()
                       ) &&
                       this.state.departurePort !== "" &&
-                      this.state.departurePortObject === undefined
+                      !this.state.departurePortObject
                     );
                   })
                   .map((port) => {
                     return (
                       <div
+                      className="dropdown-item"
                         onClick={() =>
                           this.setState({
                             departurePort: port.port_name,
@@ -301,18 +301,65 @@ export class Dapp extends React.Component {
           <div className="form-row">
             <div className="col-sm-6">
               <label htmlFor="inputArrivalPort">Port of arrival</label>
-              <input
-                type="text"
-                className="form-control"
-                id="inputArrivalPort"
-                aria-describedby="arrivalPortHelp"
-                placeholder="Port of arrival"
-                value={this.state.arrivalPort}
-                onChange={(e) => this.setState({ arrivalPort: e.target.value })}
-              />
-              <small id="arrivalPortHelp" className="form-text text-muted">
-                Help Text
-              </small>
+              <div style={{ display: "flex" }}>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="inputArrivalPort"
+                  aria-describedby="arrivalPortHelp"
+                  placeholder="Port of arrival"
+                  value={this.state.arrivalPort}
+                  onChange={(e) =>
+                    !this.state.arrivalPortObject ? this.setState({ arrivalPort: e.target.value }) : null
+                  }
+                />
+                <button
+                  className={`btn ${
+                    this.state.arrivalPortObject
+                      ? "btn-primary"
+                      : "btn-secondary"
+                  }`}
+                  disabled={!this.state.arrivalPortObject}
+                  onClick={() =>
+                    this.setState({
+                      arrivalPort: "",
+                      arrivalPortObject: undefined,
+                    })
+                  }
+                >
+                  x
+                </button>
+                </div>
+                <small id="departurePortHelp" className="form-text text-muted">
+                  Type the port name and select one port
+                </small>
+                <div>
+                  {port_malaga.data
+                    .filter((port) => {
+                      return (
+                        port.port_name.includes(
+                          this.state.arrivalPort.toUpperCase()
+                        ) &&
+                        this.state.arrivalPort !== "" &&
+                        !this.state.arrivalPortObject
+                      );
+                    })
+                    .map((port) => {
+                      return (
+                        <div
+                          className="dropdown-item"
+                          onClick={() =>
+                            this.setState({
+                              arrivalPort: port.port_name,
+                              arrivalPortObject: port,
+                            })
+                          }
+                        >
+                          {port.port_name}
+                        </div>
+                      );
+                    })}
+              </div>
             </div>
 
             <div className="col-sm-6">
@@ -370,8 +417,7 @@ export class Dapp extends React.Component {
           <button
             type="button"
             className="btn btn-primary"
-            onClick=
-            {(event) => this._subscribePolicy(event)}
+            onClick={(event) => this._subscribePolicy(event)}
           >
             Subscribe Policy
           </button>
@@ -381,13 +427,11 @@ export class Dapp extends React.Component {
           <button
             type="button"
             className="btn btn-primary btn-success"
-            onClick=
-            {() => this._updatePolicyStatus()}
+            onClick={() => this._updatePolicyStatus()}
           >
             Update Policy Status
           </button>
         </div>
-
       </div>
     );
   }
@@ -462,12 +506,16 @@ export class Dapp extends React.Component {
 
   _checkNetwork() {
     const KOVAN_NETWORK_ID = "42";
-    if (window.ethereum.networkVersion === HARDHAT_NETWORK_ID || window.ethereum.networkVersion === KOVAN_NETWORK_ID) {
+    if (
+      window.ethereum.networkVersion === HARDHAT_NETWORK_ID ||
+      window.ethereum.networkVersion === KOVAN_NETWORK_ID
+    ) {
       return true;
     }
 
     this.setState({
-      networkError: "Please connect Metamask to Localhost:8545 or Kovan network.",
+      networkError:
+        "Please connect Metamask to Localhost:8545 or Kovan network.",
     });
 
     return false;
@@ -502,9 +550,8 @@ export class Dapp extends React.Component {
         this.state.arrivalPort,
         { value: insuredSum }
       );
-      
-      window.alert("Transaction success!")
 
+      window.alert("Transaction success!");
     } catch (error) {
       if (error.code === ERROR_CODE_TX_REJECTED_BY_USER) {
         console.log("User rejected the transaction.");
@@ -526,21 +573,34 @@ export class Dapp extends React.Component {
 
       // array index based on 'PolicyStatus' enum (smart contract code)
       switch (_policyStatusRaw) {
-        case 0: _policyStatus = "CREATED"; break;
-        case 1: _policyStatus = "RUNNING"; break;
-        case 2: _policyStatus = "COMPLETED"; break;
-        case 3: _policyStatus = "CLAIMED"; break;
-        case 4: _policyStatus = "PAIDOUT"; break;
-        default: _policyStatus = "UNKNOWN";
+        case 0:
+          _policyStatus = "CREATED";
+          break;
+        case 1:
+          _policyStatus = "RUNNING";
+          break;
+        case 2:
+          _policyStatus = "COMPLETED";
+          break;
+        case 3:
+          _policyStatus = "CLAIMED";
+          break;
+        case 4:
+          _policyStatus = "PAIDOUT";
+          break;
+        default:
+          _policyStatus = "UNKNOWN";
       }
 
       if (_policyId == 0) {
-        window.alert("You don't have policy registered or it is still being created.")
+        window.alert(
+          "You don't have policy registered or it is still being created."
+        );
       } else {
         this.setState({ policyId: _policyId, policyStatus: _policyStatus });
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return;
     }
   }
