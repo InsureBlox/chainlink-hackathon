@@ -225,7 +225,6 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         policies[_beneficiary].coverage.gustThreshold = _gustThreshold;
     }
 
-
     /**********  PRICING FUNCTIONS **********/
 
     // Calculate the premium
@@ -283,7 +282,7 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
               Chainlink.Request memory request = buildChainlinkRequest(weatherJobId, address(this), this.receiveWeatherData.selector);
               // Request datas from API : coordinate(lat, lng) and gust
               // TO DO
-              request.add("gust", "");
+              request.add("uuid", policy.ship.id);
               // Sends the request
               bytes32 requestId = sendChainlinkRequestTo(weatherOracle, request, weatherFee);
               requestToPolicyAddr[requestId] = addr;
