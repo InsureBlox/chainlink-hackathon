@@ -195,7 +195,7 @@ export class Dapp extends React.Component {
                 onChange={(e) => this.setState({ shipId: e.target.value })}
               />
               <small id="shipIdHelp" className="form-text text-muted">
-                Help Text
+                Type in a Ship Id or search for a vessel in the first input
               </small>
             </div>
             <div className="col-sm-6">
@@ -212,7 +212,7 @@ export class Dapp extends React.Component {
                 }
               />
               <small id="shipmentValueHelp" className="form-text text-muted">
-                Help Text
+                Type in the shipment value
               </small>
             </div>
           </div>
@@ -301,7 +301,7 @@ export class Dapp extends React.Component {
                 }
               />
               <small id="departureHelp" className="form-text text-muted">
-                Help Text
+                Select the departure date
               </small>
             </div>
           </div>
@@ -388,14 +388,13 @@ export class Dapp extends React.Component {
                 onChange={(e) => this.setState({ arrivalDate: e.target.value })}
               />
               <small id="arrivalHelp" className="form-text text-muted">
-                Help Text
+                Select the arrival date
               </small>
             </div>
           </div>
         </div>
 
         <div>State</div>
-        <div>{process.env.REACT_APP_VESSEL_API_KEY}</div>
         {this.state.departureDate && (
           <div>
             Unix departure date:{" "}
