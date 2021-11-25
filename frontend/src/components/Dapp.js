@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 
 import { ethers } from "ethers";
 
@@ -11,11 +12,14 @@ import { TransactionErrorMessage } from "./TransactionErrorMessage";
 
 import "../index.css";
 
+import port_malaga from "../api/port_malaga.json";
+import vessels from "../api/vessels.json";
+
 const HARDHAT_NETWORK_ID = "31337";
 const KOVAN_NETWORK_ID = "42";
 
 const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
-let insuranceContract
+let insuranceContract;
 
 export class Dapp extends React.Component {
   constructor(props) {
@@ -25,8 +29,11 @@ export class Dapp extends React.Component {
       selectedAddress: undefined,
       transactionError: undefined,
       networkError: undefined,
+      shipObject: undefined,
+      shipName: "",
       shipId: "",
       shipmentValue: "",
+      departurePortObject: undefined,
       departurePort: "",
       departureDate: "",
       arrivalPort: "",
@@ -36,6 +43,41 @@ export class Dapp extends React.Component {
     };
 
     this.state = this.initialState;
+  }
+
+  componentDidMount() {
+    /* const headers = {
+      "Content-Type": "application/json", // "application/x-www-form-urlencoded", // "text/plain",
+      "Access-Control-Allow-Origin": "*",
+    };
+
+    axios({
+      method: "get",
+      url: `https://api.datalastic.com/api/v0/vessel_inradius?api-key=XXX&lat=29.15915&lon=-89.25454&radius=10`,
+      withCredentials: false,
+      headers,
+    })
+      .then(function (response) {
+        // handle success
+        console.log(response);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+      }); */
+    /* axios
+      .get(
+        "https://api.datalastic.com/api/v0/vessel_inradius?api-key=XXX&lat=29.15915&lon=-89.25454&radius=10",
+        { headers }
+      )
+      .then(function (response) {
+        // handle success
+        console.log(response);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+      }); */
   }
 
   render() {
@@ -64,6 +106,77 @@ export class Dapp extends React.Component {
         <hr />
 
         <div className="form-group">
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={(event) => this._subscribePolicy(event)}
+          >
+            subscribePolicy
+          </button>
+        </div>
+
+        <hr />
+
+        <div className="form-group">
+          <div className="form-row">
+            <div className="col-sm-6">
+              <label htmlFor="inputShipName">Ship Name</label>
+              <div style={{ display: "flex" }}>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="inputShipName"
+                  aria-describedby="shipNameHelp"
+                  placeholder="Ship Name"
+                  value={this.state.shipName}
+                  onChange={(e) => this.setState({ shipName: e.target.value })}
+                />
+                <button
+                  className={`btn ${
+                    this.state.shipObject ? "btn-primary" : "btn-secondary"
+                  }`}
+                  disabled={this.state.shipObject === undefined}
+                  onClick={() =>
+                    this.setState({
+                      shipName: "",
+                      shipObject: undefined,
+                    })
+                  }
+                >
+                  x
+                </button>
+              </div>
+
+              <small id="shipNameHelp" className="form-text text-muted">
+                Search for a vessel and select it
+              </small>
+              <div>
+                {vessels.data.vessels
+                  .filter((vessel) => {
+                    return (
+                      vessel.name.includes(this.state.shipName.toUpperCase()) &&
+                      this.state.shipName !== "" &&
+                      this.state.shipObject === undefined
+                    );
+                  })
+                  .map((vessel) => {
+                    return (
+                      <div
+                        onClick={() =>
+                          this.setState({
+                            shipName: vessel.name,
+                            shipId: vessel.uuid,
+                            shipObject: vessel,
+                          })
+                        }
+                      >
+                        {vessel.name}
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          </div>
           <div className="form-row">
             <div className="col-sm-6">
               <label htmlFor="inputShipId">Ship Id</label>
@@ -102,20 +215,64 @@ export class Dapp extends React.Component {
           <div className="form-row">
             <div className="col-sm-6">
               <label htmlFor="inputDeparturePort">Port of departure</label>
-              <input
-                type="text"
-                className="form-control"
-                id="inputDeparturePort"
-                aria-describedby="departurePortHelp"
-                placeholder="Port of departure"
-                value={this.state.departurePort}
-                onChange={(e) =>
-                  this.setState({ departurePort: e.target.value })
-                }
-              />
+              <div style={{ display: "flex" }}>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="inputDeparturePort"
+                  aria-describedby="departurePortHelp"
+                  placeholder="Port of departure"
+                  value={this.state.departurePort}
+                  onChange={(e) => {
+                    this.setState({ departurePort: e.target.value });
+                  }}
+                />
+                <button
+                  className={`btn ${
+                    this.state.departurePortObject
+                      ? "btn-primary"
+                      : "btn-secondary"
+                  }`}
+                  disabled={this.state.departurePortObject === undefined}
+                  onClick={() =>
+                    this.setState({
+                      departurePort: "",
+                      departurePortObject: undefined,
+                    })
+                  }
+                >
+                  x
+                </button>
+              </div>
               <small id="departurePortHelp" className="form-text text-muted">
-                Help Text
+                Type the port name and select one port
               </small>
+              <div>
+                {port_malaga.data
+                  .filter((port) => {
+                    return (
+                      port.port_name.includes(
+                        this.state.departurePort.toUpperCase()
+                      ) &&
+                      this.state.departurePort !== "" &&
+                      this.state.departurePortObject === undefined
+                    );
+                  })
+                  .map((port) => {
+                    return (
+                      <div
+                        onClick={() =>
+                          this.setState({
+                            departurePort: port.port_name,
+                            departurePortObject: port,
+                          })
+                        }
+                      >
+                        {port.port_name}
+                      </div>
+                    );
+                  })}
+              </div>
             </div>
 
             <div className="col-sm-6">
@@ -181,6 +338,7 @@ export class Dapp extends React.Component {
         </div>
 
         <div>State</div>
+        <div>{process.env.REACT_APP_VESSEL_API_KEY}</div>
         {this.state.departureDate && (
           <div>
             Unix departure date:{" "}
@@ -320,37 +478,39 @@ export class Dapp extends React.Component {
 
     // TODO Validate the fields here or somewhere else
     if (this.state.shipId == "") {
-      console.log("Invalid field(s)")
+      console.log("Invalid field(s)");
       return;
     }
 
-    // TODO 
+    // TODO
     // customer shoudn't be able to change this value
-    // hardvalue for a catnat event (occure 1/200) same as SmartContract 
+    // hardvalue for a catnat event (occure 1/200) same as SmartContract
     // we may change this soon
     const INSURANCE_NUMBER_DEFAULT = 200;
 
-    let insuredSum = Math.round(this.state.shipmentValue / INSURANCE_NUMBER_DEFAULT);
+    let insuredSum = Math.round(
+      this.state.shipmentValue / INSURANCE_NUMBER_DEFAULT
+    );
 
     try {
       await insuranceContract.subscribePolicy(
         this.state.shipId,
         this.state.shipmentValue,
-        (new Date(this.state.departureDate).getTime() / 1000),
-        (new Date(this.state.arrivalDate).getTime() / 1000),
+        new Date(this.state.departureDate).getTime() / 1000,
+        new Date(this.state.arrivalDate).getTime() / 1000,
         this.state.departurePort,
         this.state.arrivalPort,
         { value: insuredSum }
       );
-
+      
       window.alert("Transaction success!")
 
     } catch (error) {
       if (error.code === ERROR_CODE_TX_REJECTED_BY_USER) {
-        console.log("User rejected the transaction.")
+        console.log("User rejected the transaction.");
         return;
       }
-      console.log(error)
+      console.log(error);
     }
   }
 
