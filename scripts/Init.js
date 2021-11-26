@@ -13,15 +13,15 @@ async function main() {
   console.log("Job Id set to : " + jobId);
   console.log("Fees set to : " + fee);
 
-  // Set the incident threshold
-  const incidentsThreshold = 1
-  await delayInsurance.setIncidentThreshold(incidentsThreshold);
-  console.log("Incident threshold set to : " + incidentsThreshold);
-
-  // Set update timer in seconds (1 hour = 60 * 60)
-  const updateTimer = 60*60;
-  await delayInsurance.setUpdateTimer(updateTimer);
-  console.log("Keeper update timer set to : " + updateTimer);
+  // // Set the incident threshold
+  // const incidentsThreshold = 1
+  // await delayInsurance.setIncidentThreshold(incidentsThreshold);
+  // console.log("Incident threshold set to : " + incidentsThreshold);
+  //
+  // // Set update timer in seconds (1 hour = 60 * 60)
+  // const updateTimer = 60;
+  // await delayInsurance.setUpdateTimer(updateTimer);
+  // console.log("Keeper update timer set to : " + updateTimer);
 
 }
 

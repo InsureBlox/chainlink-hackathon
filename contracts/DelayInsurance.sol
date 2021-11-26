@@ -93,7 +93,7 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
     constructor() public {
         admin = msg.sender;
         // Error on tests -> Transaction reverted: function call to a non-contract account
-        //setPublicChainlinkToken();
+        setPublicChainlinkToken();
     }
 
     /**********  PUBLIC FUNCTIONS **********/
@@ -166,19 +166,6 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
     function getPolicy() public view returns (Policy memory) {
         return policies[msg.sender];
     }
-     uint utest;
-     function getTest() public view returns (uint256) {
-         return utest;
-     }
-
-    function getDate() public view returns (uint256) {
-        return policies[msg.sender].coverage.startDate;
-    }
-
-     uint ublock;
-     function getBlock() public view returns (uint256) {
-         return ublock;
-     }
 
     function getGustThreshold() public view returns (uint256) {
         return policies[msg.sender].coverage.gustThreshold;
@@ -309,8 +296,7 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
             if (policy.coverage.status == PolicyStatus.RUNNING) {
               // Request weather data to Chainlink
               Chainlink.Request memory request = buildChainlinkRequest(weatherJobId, address(this), this.receiveWeatherData.selector);
-              // Request datas from API : coordinate(lat, lng) and gust
-              // TO DO
+
               request.add("uuid", policy.ship.id);
               // Sends the request
               bytes32 requestId = sendChainlinkRequestTo(weatherOracle, request, weatherFee);
