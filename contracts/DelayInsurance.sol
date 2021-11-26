@@ -90,10 +90,13 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
     //Enable anyone to send eth to the smart contract
     receive() external payable { }
 
-    constructor() public {
+    constructor(address _linkTokenAddress) public {
         admin = msg.sender;
-        // Error on tests -> Transaction reverted: function call to a non-contract account
-        setPublicChainlinkToken();
+        if (_linkTokenAddress == address(0)) {
+            setPublicChainlinkToken();
+        } else {
+            setChainlinkToken(_linkTokenAddress);
+        }
     }
 
     /**********  PUBLIC FUNCTIONS **********/
@@ -287,9 +290,9 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
             Policy storage policy = policies[addr];
 
             // Update all policies status
-            if (policy.coverage.startDate <= block.timestamp && policy.coverage.endDate >= block.timestamp) {
+            if ((policy.coverage.startDate <= block.timestamp && policy.coverage.endDate >= block.timestamp) && (policy.coverage.status==PolicyStatus.CREATED)) {
               policy.coverage.status = PolicyStatus.RUNNING;
-            } else if (policy.coverage.endDate < block.timestamp) {
+            } else if ((policy.coverage.endDate < block.timestamp) && (policy.coverage.status==PolicyStatus.RUNNING)) {
               policy.coverage.status = PolicyStatus.COMPLETED;
             }
 
@@ -301,9 +304,7 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
               // Sends the request
               bytes32 requestId = sendChainlinkRequestTo(weatherOracle, request, weatherFee);
               requestToPolicyAddr[requestId] = addr;
-            } else if (policy.coverage.status == PolicyStatus.CLAIMED) {
-              payOut(addr);
-            }
+            } 
         }
     }
 
@@ -321,6 +322,7 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         }
         if (policy.incidents >= incidentsThreshold /* + Should be at end port? */) {
             policy.coverage.status = PolicyStatus.CLAIMED;
+            payOut(addr);
         }
     }
 
@@ -350,7 +352,7 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
     function stringToBytes32(string memory source) private pure returns (bytes32 result) {
         bytes memory tempEmptyStringTest = bytes(source);
         if (tempEmptyStringTest.length == 0) {
-          return 0x0;
+            return 0x0;
         }
 
         assembly { // solhint-disable-line no-inline-assembly

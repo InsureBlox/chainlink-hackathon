@@ -1,7 +1,7 @@
 async function main() {
 
   const DelayInsurance = await ethers.getContractFactory("DelayInsurance");
-  const delayInsurance = await DelayInsurance.deploy();
+  const delayInsurance = await DelayInsurance.deploy("0xa36085F69e2889c224210F603D836748e7dC0088");
   const [deployer] = await ethers.getSigners();
   console.log("Deploying contracts with the account: " + deployer.address);
   await delayInsurance.deployed();

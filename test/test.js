@@ -14,7 +14,7 @@ describe('Delay Insurance test', function () {
   beforeEach(async function () {
     DelayInsurance = await ethers.getContractFactory("DelayInsurance")
     const admin = ethers.getSigners()
-    delayInsurance = await DelayInsurance.deploy()
+    delayInsurance = await DelayInsurance.deploy("0xa36085F69e2889c224210F603D836748e7dC0088")
     await delayInsurance.deployed();
   });
 
