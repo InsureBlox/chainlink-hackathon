@@ -220,6 +220,14 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         return total;
     }
 
+    function getTotalCapitalInsured() public view returns(uint256) {
+        uint total = 0;
+        for( uint i=0; i<addrPolicies.length; i++){
+            total += policies[addrPolicies[i]].ship.shipmentValue;
+        }
+        return total;
+    }
+
     /**********  SET FUNCTIONS **********/
 
     // Set up weather oracle datas
