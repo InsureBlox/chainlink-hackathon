@@ -4,8 +4,6 @@ async function main() {
 
   /* Initialise protocols functions */
 
-  //TO DO : UPGRADE NONCE MANNUALY TO SEND ALL TRANSACTIONS SUCCESFULLY.
-
   // Set weather oracle datas
   const oracleAddr = process.env.ORACLE_ADDRESS;
   const jobId = process.env.JOB_ID;

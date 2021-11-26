@@ -14,7 +14,9 @@ async function main() {
   )
   console.log("Creating policy contract for boat id : " + shipId );
 
-    console.log(await delayInsurance.getAllPolicies());
+  
+
+  console.log(await delayInsurance.getAllPolicies());
 }
 
 main()
