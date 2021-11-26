@@ -10,6 +10,8 @@ import { NoWalletDetected } from "./NoWalletDetected";
 import { ConnectWallet } from "./ConnectWallet";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 
+import { JsonToTable } from "react-json-to-table";
+
 import "../index.css";
 
 const HARDHAT_NETWORK_ID = "31337";
@@ -226,7 +228,9 @@ export class Dapp extends React.Component {
             {(new Date(this.state.arrivalDate).getTime() / 1000).toString()}
           </div>
         )}
-        <div className="word-break">{JSON.stringify(this.state)}</div>
+        <div className="word-break">
+          <JsonToTable json={this.state} />
+        </div>
 
         <div className="row">
           <div className="col-12">
