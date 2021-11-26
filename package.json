@@ -20,6 +20,7 @@
   "dependencies": {
     "@chainlink/contracts": "^0.2.2",
     "@openzeppelin/test-helpers": "^0.5.15",
-    "dotenv": "^10.0.0"
+    "dotenv": "^10.0.0",
+    "react-json-to-table": "^0.1.7"
   }
 }
