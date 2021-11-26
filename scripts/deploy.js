@@ -5,7 +5,7 @@ async function main() {
   const [deployer] = await ethers.getSigners();
   console.log("Deploying contracts with the account: " + deployer.address);
   await delayInsurance.deployed();
-  console.log("consumer deployed to:", delayInsurance.address);
+  console.log("🔥🔥🔥 Contract Deployed: https://kovan.etherscan.io/address/" + delayInsurance.address);
 
   saveFrontendFiles(delayInsurance);
 }
