@@ -111,6 +111,25 @@ describe('Delay Insurance test', function () {
     assert.equal(policyStatus, 0);
   });
 
+  it('Should get the total amount of premiums', async function () {
+    const [customer1, customer2, customer3] = await ethers.getSigners()
+
+    // Trigger subscribePolicy method using mocked data and customer1 1
+    let subscribePolicy1 = delayInsurance.connect(customer1).subscribePolicy("shipId1", shipmentValue, 1637386300, 1637559199, 1000, 2000, { from: customer1.address, value: pricePremium })
+    await expect(subscribePolicy1).to.emit(delayInsurance, 'PolicySubscription').withArgs(customer1.address, 0);
+
+    // Trigger subscribePolicy method using mocked data and customer1 2
+    let subscribePolicy2 = delayInsurance.connect(customer2).subscribePolicy("shipId2", shipmentValue, 1637386322, 16375591755, 1000, 2000, { from: customer2.address, value: pricePremium })
+    await expect(subscribePolicy2).to.emit(delayInsurance, 'PolicySubscription').withArgs(customer2.address, 1);
+
+    // Trigger subscribePolicy method using mocked data and customer1 3
+    let subscribePolicy3 = delayInsurance.connect(customer3).subscribePolicy("shipId3", shipmentValue, 1637386311, 1637559188, 1000, 2000, { from: customer3.address, value: pricePremium })
+    await expect(subscribePolicy3).to.emit(delayInsurance, 'PolicySubscription').withArgs(customer3.address, 2);
+
+    const total = await delayInsurance.connect(customer1).getTotalPremiums()
+    assert.equal(total.toNumber(), 3*pricePremium);
+  });
+
   it('Should pay when th payout is triggered', async function () {
     const [customer1, customer2] = await ethers.getSigners();
     //customer1.sendTransaction(delayInsurance.address, shipmentValue);
