@@ -11,6 +11,7 @@ import { ConnectWallet } from "./ConnectWallet";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 
 import background from "../assets/sea.jpg"
+import { JsonToTable } from "react-json-to-table";
 
 import "../index.css";
 
@@ -541,7 +542,9 @@ export class Dapp extends React.Component {
             {(new Date(this.state.arrivalDate).getTime() / 1000).toString()}
           </div>
         )}
-        <div className="word-break">{JSON.stringify(this.state)}</div>
+        <div className="word-break">
+          <JsonToTable json={this.state} />
+        </div>
 
         <hr />
 
