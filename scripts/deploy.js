@@ -5,7 +5,7 @@ async function main() {
   const [deployer] = await ethers.getSigners();
   console.log("Deploying contracts with the account: " + deployer.address);
   await delayInsurance.deployed();
-  console.log("consumer deployed to:", delayInsurance.address);
+  console.log("DelayInsurance deployed to:", delayInsurance.address);
 
   saveFrontendFiles(delayInsurance);
 }

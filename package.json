@@ -19,9 +19,15 @@
   },
   "dependencies": {
     "@chainlink/contracts": "^0.2.2",
-    "@nomiclabs/hardhat-etherscan": "^2.1.7",
+    "@nomiclabs/hardhat-etherscan": "^2.1.8",
     "@openzeppelin/test-helpers": "^0.5.15",
+<<<<<<< Updated upstream
     "dotenv": "^10.0.0",
     "web3": "^1.6.1"
+=======
+    "coverage": "^0.4.1",
+    "dotenv": "^10.0.0",
+    "solidity": "0.0.1"
+>>>>>>> Stashed changes
   }
 }

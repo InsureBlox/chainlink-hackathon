@@ -57,33 +57,25 @@ describe('Delay Insurance test', function () {
     assert(ex, 'You should pay the premium amount')
   });
 
-  /*it('should pay out', async function () {
-    const [admin, customer] = await ethers.getSigners()
+  it('should verify incidents', async function () {
+    const [customer] = await ethers.getSigners()
 
     // Set very old startDate and a future endDate to make sure the vessel journey is currently happening
     let startDate = 974448412; // startDate 17/11/2000
-    let endDate = 1763366812; // startDate 17/11/2025
+    let endDate = 1451520000; // endDate 31/12/2015
 
-    // Trigger subscribePolicy method
+    // Trigger subscribePolicy method for customer1 & customer2
     await delayInsurance
       .connect(customer)
-      .subscribePolicy("shipId_customer1", shipmentValue, startDate, endDate, 1000, 2000, { from: customer.address, value: pricePremium })
+      .subscribePolicy("shipId_customer", shipmentValue, startDate, endDate, 1000, 2000, { from: customer.address, value: pricePremium })
 
-    // Get customer1 balance before insurance claim
-    const customerBalance1 = await provider.getBalance(customer.address);
-    console.log("customer balance: " + ethers.utils.formatEther(customerBalance1))
-
-    // Trigger UpdateContracts method manually - this is being triggered by Chainlink Keepers
-    await delayInsurance.connect(admin).payOut(customer.address);
+    // Trigger UpdateContracts method manually - this is being triggered by Chainlink Keepers6
+    await delayInsurance.connect(customer).UpdateContracts();
 
     const policyStatus = await delayInsurance.connect(customer).getPolicyStatus();
+    assert.equal(policyStatus, 2);
+  });
 
-    // Get customer1 balance after insurance claim
-    const customerBalance2 = await provider.getBalance(customer.address);
-    console.log("customer balance after UpdateContracts: " + ethers.utils.formatEther(customerBalance2))
-
-    assert.equal(customerBalance1.toString(), customerBalance2.toString())
-  });*/
 
   it('Should get the policy gust threshold', async function () {
     const [customer] = await ethers.getSigners()
@@ -96,19 +88,8 @@ describe('Delay Insurance test', function () {
     const policyThreshold = await delayInsurance.connect(customer).getGustThreshold();
     const calculThreshold = await delayInsurance.connect(customer).calculateGustThreshold(0,0,0,0);
 
+
     assert.equal(calculThreshold.toString(), policyThreshold.toString());
-  });
-
-  it('Should get the policy status', async function () {
-    const [customer] = await ethers.getSigners()
-
-    // Trigger subscribePolicy method
-    await delayInsurance
-      .connect(customer)
-      .subscribePolicy("shipId_customer", shipmentValue, 1637386311, 1637559188, 1000, 2000, { from: customer.address, value: pricePremium })
-    
-    const policyStatus = await delayInsurance.connect(customer).getPolicyStatus();
-    assert.equal(policyStatus, 0);
   });
 
   it('Should get the total amount of premiums', async function () {
