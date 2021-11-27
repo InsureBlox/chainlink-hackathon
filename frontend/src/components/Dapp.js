@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 
-import { ethers } from "ethers";
+import { Contract, providers, utils } from "ethers";
 
 import DelayInsuranceArtifact from "../contracts/InsuranceContract.json";
 import contractAddress from "../contracts/contract-address.json";
@@ -91,7 +91,7 @@ export class Dapp extends React.Component {
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 
           <div class="container">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand col-sm" href="#">
               <b>⛈️ Ocean Storm</b> <h6 display="inline">by InsureBlox</h6>
             </a>
 
@@ -611,9 +611,9 @@ export class Dapp extends React.Component {
   }
 
   async _intializeEthers() {
-    this._provider = new ethers.providers.Web3Provider(window.ethereum);
+    this._provider = new providers.Web3Provider(window.ethereum);
 
-    insuranceContract = await new ethers.Contract(
+    insuranceContract = await new Contract(
       contractAddress.Contract,
       DelayInsuranceArtifact.abi,
       this._provider.getSigner(0)
@@ -678,8 +678,8 @@ export class Dapp extends React.Component {
         this.state.shipmentValue,
         new Date(this.state.departureDate).getTime() / 1000,
         new Date(this.state.arrivalDate).getTime() / 1000,
-        this.state.departurePort,
-        this.state.arrivalPort,
+        utils.formatBytes32String(this.state.departurePort),
+        utils.formatBytes32String(this.state.arrivalPort),
         { value: insuredSum }
       );
       window.alert("Transaction success!");
@@ -723,7 +723,7 @@ export class Dapp extends React.Component {
           _policyStatus = "UNKNOWN";
       }
 
-      if (_policyId == 0) {
+      if (false/* _policyId == 0 */) {
         window.alert(
           "You don't have policy registered or it is still being created."
         );
