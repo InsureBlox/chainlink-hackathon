@@ -1,6 +1,7 @@
 import React from "react";
 import { NoWalletDetected } from "./NoWalletDetected";
-import claims from "../assets/claims.json";
+import contracts from "../assets/contracts.json";
+import "./contracts.css";
 
 export class Contracts extends React.Component {
   constructor(props) {
@@ -17,6 +18,43 @@ export class Contracts extends React.Component {
       return <NoWalletDetected />;
     }
 
-    return <div>Contracts...</div>;
+    return (
+      <div className="tableWrapper">
+        <div className="tableWrapper2">
+          <table>
+            <thead class="sc-dFtzdE dEFjwz">
+              <tr>
+                <th>Cover Id</th>
+                <th>Adress</th>
+                <th>Sum Assured</th>
+                <th>Currency</th>
+                <th>Purchase Date</th>
+                <th>Expiry</th>
+                <th>Claim Id</th>
+                <th>Vote</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {contracts.map((contract, index) => {
+                return (
+                  <tr key={index}>
+                    <td>{contract.coverId.hex}</td>
+                    <td>{contract.address}</td>
+                    <td>{contract.sumAssured.hex}</td>
+                    <td>{contract.currency}</td>
+                    <td>{contract.purchaseDate}</td>
+                    <td>{contract.expiry}</td>
+                    <td>{contract.claimId}</td>
+                    <td>{contract.vote}</td>
+                    <td>{contract.status}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
   }
 }
