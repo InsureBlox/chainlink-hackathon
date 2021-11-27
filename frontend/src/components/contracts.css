@@ -25,25 +25,28 @@ tr {
   background: rgb(247, 249, 252);
 }
 
+td,
+th {
+  padding: 1rem 1rem 1rem 1.5rem;
+}
+
 td {
-  padding: 1rem 1rem 1rem 2rem;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   text-align: left;
 }
 
-thead {
-  color: rgba(91, 105, 131, 0.792);
-}
-
-thead th {
-  padding: 1rem 1rem 1rem 2rem;
+th {
   white-space: nowrap;
   width: 3rem;
   text-align: left;
   font-weight: 600;
   background: rgb(255, 255, 255);
+}
+
+thead {
+  color: rgba(91, 105, 131, 0.792);
 }
 
 tbody > tr:nth-child(2n) {

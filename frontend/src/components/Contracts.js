@@ -22,7 +22,7 @@ export class Contracts extends React.Component {
       <div className="tableWrapper">
         <div className="tableWrapper2">
           <table>
-            <thead class="sc-dFtzdE dEFjwz">
+            <thead>
               <tr>
                 <th>Cover Id</th>
                 <th>Adress</th>
@@ -43,8 +43,20 @@ export class Contracts extends React.Component {
                     <td>{contract.address}</td>
                     <td>{contract.sumAssured.hex}</td>
                     <td>{contract.currency}</td>
-                    <td>{contract.purchaseDate}</td>
-                    <td>{contract.expiry}</td>
+                    <td>
+                      {new Date(contract.purchaseDate).toLocaleDateString({
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                      })}
+                    </td>
+                    <td>
+                      {new Date(contract.expiry).toLocaleDateString({
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                      })}
+                    </td>
                     <td>{contract.claimId}</td>
                     <td>{contract.vote}</td>
                     <td>{contract.status}</td>
