@@ -11,12 +11,14 @@
   overflow: initial;
   width: auto;
   border: 0px;
+  overflow: scroll;
+  white-space: nowrap;
 }
 
 table {
   /* table-layout: fixed;
   overflow-x: scroll; */
-  display: block;
+  display: inline-table;
   overflow-x: auto;
   white-space: nowrap;
 
