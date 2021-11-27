@@ -34,6 +34,7 @@ export class Dapp extends React.Component {
       transactionError: undefined,
       networkError: undefined,
       shipId: "4ae72971-77b3-9167-973e-1da1c773ad41",
+      shipName: "QUEEN MARY",
       shipmentValue: "1000",
       departurePort: "MALAGA",
       departureDate: "2021-12-01",
