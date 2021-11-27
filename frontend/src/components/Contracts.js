@@ -50,6 +50,7 @@ export class Contracts extends React.Component {
                     <td>
                       <a
                         target="_blank"
+                        rel="noreferrer"
                         href={`https://kovan.etherscan.io/tx/${contract.address}`}
                       >
                         View

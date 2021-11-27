@@ -1,7 +1,7 @@
 import React from "react";
-import axios from "axios";
+// import axios from "axios";
 
-import { Contract, providers, utils } from "ethers";
+import { providers, utils } from "ethers";
 
 import { NoWalletDetected } from "./NoWalletDetected";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
@@ -558,7 +558,7 @@ export class Dapp extends React.Component {
     event.preventDefault();
 
     // TODO Validate the fields here or somewhere else
-    if (this.state.shipId == "") {
+    if (this.state.shipId === "") {
       console.log("Invalid field(s)");
       return;
     }

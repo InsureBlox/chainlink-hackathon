@@ -1,8 +1,8 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import DelayInsuranceArtifact from "../contracts/InsuranceContract.json";
 import contractAddress from "../contracts/contract-address.json";
-import { Contract, providers, utils } from "ethers";
+import { Contract, providers } from "ethers";
 import { NoWalletDetected } from "./NoWalletDetected";
 import { ConnectWallet } from "./ConnectWallet";
 import { Dapp } from "./Dapp";
