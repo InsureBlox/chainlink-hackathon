@@ -54,8 +54,13 @@ export function Navigation() {
       </nav>
 
       <div
-        className="jumbotron"
-        style={{ padding: "0", height: "6em", overflow: "hidden" }}
+        style={{
+          padding: "0",
+          height: "6em",
+          overflow: "hidden",
+          marginBottom: "2rem",
+          backgroundColor: "#e9ecef",
+        }}
       >
         <img
           className="img-fluid"
