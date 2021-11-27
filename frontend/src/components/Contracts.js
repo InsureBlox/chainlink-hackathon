@@ -1,0 +1,85 @@
+import React from "react";
+import { NoWalletDetected } from "./NoWalletDetected";
+import contracts from "../assets/contracts.json";
+import "./contracts.css";
+
+export class Contracts extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.initialState = {};
+
+    this.state = this.initialState;
+  }
+
+  formatDate(dateString) {
+    return new Intl.DateTimeFormat({
+      month: "2-digit",
+      day: "2-digit",
+      year: "numeric",
+    }).format(new Date(dateString));
+  }
+
+  formatVote(number) {
+    if (number === -1) {
+      return <div className="text-danger">Denied</div>;
+    }
+    if (number === 1) {
+      return <div className="text-success">Accepted</div>;
+    }
+    return <div>No valid vote</div>;
+  }
+
+  render() {
+    if (window.ethereum === undefined || !this.props.selectedAddress) {
+      return <NoWalletDetected />;
+    }
+
+    return (
+      <div className="tableWrapper">
+        <div className="tableWrapper2">
+          <table>
+            <thead>
+              <tr>
+                <th>Cover Id</th>
+                <th>Address</th>
+                <th>Sum Assured</th>
+                <th>Currency</th>
+                <th>Purchase Date</th>
+                <th>Expiry</th>
+                <th>Claim Id</th>
+                <th>Vote</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {contracts.map((contract, index) => {
+                return (
+                  <tr key={index}>
+                    <td>{parseInt(contract.coverId.hex, 16)}</td>
+                    <td>
+                      <a
+                        target="_blank"
+                        rel="noreferrer"
+                        href={`https://kovan.etherscan.io/tx/${contract.address}`}
+                      >
+                        View
+                      </a>
+                    </td>
+                    <td>{parseInt(contract.sumAssured.hex, 16)}</td>
+                    <td>{contract.currency}</td>
+                    <td>{this.formatDate(contract.purchaseDate)}</td>
+                    <td>{this.formatDate(contract.expiry)}</td>
+                    <td>{contract.claimId}</td>
+                    <td>{this.formatVote(contract.vote)}</td>
+                    <td>{contract.status}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  }
+}

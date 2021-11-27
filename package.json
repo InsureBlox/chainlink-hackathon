@@ -21,7 +21,7 @@
     "@chainlink/contracts": "^0.2.2",
     "@nomiclabs/hardhat-etherscan": "^2.1.8",
     "@openzeppelin/test-helpers": "^0.5.15",
-    "coverage": "^0.4.1",
-    "dotenv": "^10.0.0"
+    "dotenv": "^10.0.0",
+    "react-json-to-table": "^0.1.7"
   }
 }
