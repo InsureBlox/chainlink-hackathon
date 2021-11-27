@@ -1,5 +1,6 @@
 import React from "react";
 import background from "../assets/sea.jpg";
+import { Link } from "react-router-dom";
 
 export class Navigation extends React.Component {
   constructor(props) {
@@ -13,14 +14,14 @@ export class Navigation extends React.Component {
   render() {
     return (
       <div>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-          <div class="container">
-            <a class="navbar-brand col-sm" href="#">
+        <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+          <div className="container">
+            <a className="navbar-brand col-sm" href="#">
               <b>⛈️ Ocean Storm</b> <h6 display="inline">by InsureBlox</h6>
             </a>
 
             <button
-              class="navbar-toggler"
+              className="navbar-toggler"
               type="button"
               data-toggle="collapse"
               data-target="#navbarSupportedContent"
@@ -28,26 +29,29 @@ export class Navigation extends React.Component {
               aria-expanded="false"
               aria-label="Toggle navigation"
             >
-              <span class="navbar-toggler-icon"></span>
+              <span className="navbar-toggler-icon"></span>
             </button>
 
             {/* <div> */}
 
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-              <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                  <a class="nav-link" href="/">
-                    Home <span class="sr-only">(current)</span>
-                  </a>
+            <div
+              className="collapse navbar-collapse"
+              id="navbarSupportedContent"
+            >
+              <ul className="navbar-nav mr-auto">
+                <li className="nav-item active">
+                  <Link to="/" className="nav-link">
+                    Home
+                  </Link>
                 </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="/contracts">
+                <li className="nav-item">
+                  <Link to="/contracts" className="nav-link">
                     Contracts
-                  </a>
+                  </Link>
                 </li>
-                {/*  <li class="nav-item dropdown">
+                {/*  <li className="nav-item dropdown">
                   <a
-                    class="nav-link dropdown-toggle"
+                    className="nav-link dropdown-toggle"
                     href="#"
                     id="navbarDropdown"
                     role="button"
@@ -56,32 +60,32 @@ export class Navigation extends React.Component {
                   >
                     Dropdown
                   </a>
-                  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="#">
+                  <div className="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a className="dropdown-item" href="#">
                       Action
                     </a>
-                    <a class="dropdown-item" href="#">
+                    <a className="dropdown-item" href="#">
                       Another action
                     </a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#">
+                    <div className="dropdown-divider"></div>
+                    <a className="dropdown-item" href="#">
                       Something else here
                     </a>
                   </div>
                 </li>
-                <li class="nav-item">
-                  <a class="nav-link disabled">Disabled</a>
+                <li className="nav-item">
+                  <a className="nav-link disabled">Disabled</a>
                 </li> */}
               </ul>
-              <form class="form-inline my-2 my-lg-0">
+              <form className="form-inline my-2 my-lg-0">
                 <input
-                  class="form-control mr-sm-2"
+                  className="form-control mr-sm-2"
                   type="search"
                   placeholder="Search"
                   aria-label="Search"
                 />
                 <button
-                  class="btn btn-outline-success my-2 my-sm-0"
+                  className="btn btn-outline-success my-2 my-sm-0"
                   type="submit"
                 >
                   Search

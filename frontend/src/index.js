@@ -7,6 +7,7 @@ import "./index.css";
 // We import bootstrap here, but you can remove if you want
 import "bootstrap/dist/css/bootstrap.css";
 import { Navigation } from "./components/Navigation";
+import { DappWrapper } from "./components/DappWrapper";
 
 // This is the entry point of your application, but it just renders the Dapp
 // react component. All of the logic is contained in it.
@@ -16,12 +17,24 @@ ReactDOM.render(
     <BrowserRouter>
       <Navigation />
       <div className="container p-4">
-        <Routes>
-          <Route path="/" element={<Dapp />} />
-          <Route path="/contracts" element={<div>abc</div>} />
-        </Routes>
+        <DappWrapper />
       </div>
     </BrowserRouter>
   </React.StrictMode>,
   document.getElementById("root")
 );
+/* 
+if (window.ethereum === undefined) {
+  return <NoWalletDetected />;
+}
+
+if (!this.state.selectedAddress) {
+  return (
+    <ConnectWallet
+      connectWallet={() => this._connectWallet()}
+      networkError={this.state.networkError}
+      dismiss={() => this._dismissNetworkError()}
+    />
+  );
+}
+ */

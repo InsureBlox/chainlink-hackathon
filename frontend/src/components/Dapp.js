@@ -3,31 +3,21 @@ import axios from "axios";
 
 import { Contract, providers, utils } from "ethers";
 
-import DelayInsuranceArtifact from "../contracts/InsuranceContract.json";
-import contractAddress from "../contracts/contract-address.json";
-
 import { NoWalletDetected } from "./NoWalletDetected";
-import { ConnectWallet } from "./ConnectWallet";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 
-import claims from "../assets/claims.json";
 import { JsonToTable } from "react-json-to-table";
 
 import ports from "../api/ports.json";
 import vessels from "../api/vessels.json";
 
-const HARDHAT_NETWORK_ID = "31337";
-const KOVAN_NETWORK_ID = "42";
-
 const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
-let insuranceContract;
 
 export class Dapp extends React.Component {
   constructor(props) {
     super(props);
 
     this.initialState = {
-      selectedAddress: undefined,
       transactionError: undefined,
       networkError: undefined,
       shipId: "4ae72971-77b3-9167-973e-1da1c773ad41",
@@ -66,18 +56,9 @@ export class Dapp extends React.Component {
   }
 
   render() {
-    if (window.ethereum === undefined) {
+    if (window.ethereum === undefined || !this.props.selectedAddress) {
+      // ToDo: Navigate to /home
       return <NoWalletDetected />;
-    }
-
-    if (!this.state.selectedAddress) {
-      return (
-        <ConnectWallet
-          connectWallet={() => this._connectWallet()}
-          networkError={this.state.networkError}
-          dismiss={() => this._dismissNetworkError()}
-        />
-      );
     }
 
     return (
@@ -542,60 +523,8 @@ export class Dapp extends React.Component {
     );
   }
 
-  async _connectWallet() {
-    // It returns a promise that will resolve to the user's address.
-    const [selectedAddress] = await window.ethereum.enable();
-
-    if (!this._checkNetwork()) {
-      return;
-    }
-
-    this._initialize(selectedAddress);
-
-    // We reinitialize it whenever the user changes their account.
-    window.ethereum.on("accountsChanged", ([newAddress]) => {
-      // `accountsChanged` event can be triggered with an undefined newAddress.
-      // This happens when the user removes the Dapp from the "Connected
-      // list of sites allowed access to your addresses" (Metamask > Settings > Connections)
-      // To avoid errors, we reset the dapp state
-      if (newAddress === undefined) {
-        return this._resetState();
-      }
-
-      this._initialize(newAddress);
-    });
-
-    // We reset the dapp state if the network is changed
-    window.ethereum.on("networkChanged", ([networkId]) => {
-      this._resetState();
-    });
-  }
-
-  _initialize(userAddress) {
-    // We first store the user's address in the component's state
-    this.setState({
-      selectedAddress: userAddress,
-    });
-
-    this._intializeEthers();
-  }
-
-  async _intializeEthers() {
-    this._provider = new providers.Web3Provider(window.ethereum);
-
-    insuranceContract = await new Contract(
-      contractAddress.Contract,
-      DelayInsuranceArtifact.abi,
-      this._provider.getSigner(0)
-    );
-  }
-
   _dismissTransactionError() {
     this.setState({ transactionError: undefined });
-  }
-
-  _dismissNetworkError() {
-    this.setState({ networkError: undefined });
   }
 
   _getRpcErrorMessage(error) {
@@ -610,7 +539,7 @@ export class Dapp extends React.Component {
     this.setState(this.initialState);
   }
 
-  _checkNetwork() {
+  /* _checkNetwork() {
     if (
       window.ethereum.networkVersion === HARDHAT_NETWORK_ID ||
       window.ethereum.networkVersion === KOVAN_NETWORK_ID
@@ -624,7 +553,7 @@ export class Dapp extends React.Component {
     });
 
     return false;
-  }
+  } */
 
   async _subscribePolicy(event) {
     event.preventDefault();
@@ -652,7 +581,7 @@ export class Dapp extends React.Component {
       const chainId = await signer.getChainId();
       if (chainId === "31337") overrides.chainId = "31337";
 
-      await insuranceContract.subscribePolicy(
+      await this.props.insuranceContract.subscribePolicy(
         this.state.shipId,
         this.state.shipmentValue,
         new Date(this.state.departureDate).getTime() / 1000,
@@ -674,7 +603,7 @@ export class Dapp extends React.Component {
   async _updatePolicyStatus() {
     try {
       // This will return a Policy (in array format) if it exists on the blockchain side
-      const getPolicy = await insuranceContract.getPolicy();
+      const getPolicy = await this.props.insuranceContract.getPolicy();
 
       // array index based on 'Policy' struct (smart contract code)
       let _policyId = parseInt(getPolicy[0], 16); //hex number
@@ -718,10 +647,10 @@ export class Dapp extends React.Component {
 
   async _updateParameters() {
     try {
-      insuranceContract.setInsuranceParameters(
+      this.props.insuranceContract.setInsuranceParameters(
         this.state.incidentsThreshold,
         this.state.keepersInterval,
-        this.state.selectedAddress,
+        this.props.selectedAddress,
         this.state.policyThreshold
       );
     } catch (error) {
@@ -733,7 +662,7 @@ export class Dapp extends React.Component {
 
   async _updateContracts() {
     try {
-      await insuranceContract.UpdateContracts();
+      await this.props.insuranceContract.UpdateContracts();
     } catch (error) {
       console.log(error);
       return;
@@ -743,7 +672,7 @@ export class Dapp extends React.Component {
   async _pricePremium() {
     let _policyPrice;
     try {
-      _policyPrice = await insuranceContract.pricePremium(
+      _policyPrice = await this.props.insuranceContract.pricePremium(
         {
           id: this.state.shipId,
           shipmentValue: this.state.shipmentValue,
