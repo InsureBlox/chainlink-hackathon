@@ -2,6 +2,7 @@ import React from "react";
 import background from "../assets/sea.jpg";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import icon from "../assets/favicon.png";
 
 export function Navigation() {
   const navigate = useNavigate();
@@ -11,7 +12,11 @@ export function Navigation() {
       <nav className="navbar navbar-expand navbar-dark bg-dark">
         <div className="container">
           <a className="navbar-brand col-sm" href="#">
-            <b>⛈️ Ocean Storm</b> <h6 display="inline">by InsureBlox</h6>
+            <b className="center-vertical" style={{ marginLeft: "-3px" }}>
+              <img className="mr-1" src={icon} width={32} height={32} /> Ocean
+              Storm
+            </b>
+            <h6 display="inline">by InsureBlox</h6>
           </a>
 
           <div className="collapse navbar-collapse" id="navbarSupportedContent">
