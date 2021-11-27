@@ -11,6 +11,7 @@ import { ConnectWallet } from "./ConnectWallet";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 
 import background from "../assets/sea.jpg"
+import claims from "../assets/claims.json"
 import { JsonToTable } from "react-json-to-table";
 
 import "../index.css";
@@ -680,7 +681,7 @@ export class Dapp extends React.Component {
     let overrides = { value: insuredSum }
 
     try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum)
+      const provider = new providers.Web3Provider(window.ethereum)
       const signer = provider.getSigner();
       const chainId = await signer.getChainId();
       if (chainId === '31337') overrides.chainId = '31337'
@@ -690,8 +691,8 @@ export class Dapp extends React.Component {
         this.state.shipmentValue,
         (new Date(this.state.departureDate).getTime() / 1000),
         (new Date(this.state.arrivalDate).getTime() / 1000),
-        ethers.utils.formatBytes32String(this.state.departurePort),
-        ethers.utils.formatBytes32String(this.state.arrivalPort),
+        utils.formatBytes32String(this.state.departurePort),
+        utils.formatBytes32String(this.state.arrivalPort),
         overrides
       );
       window.alert("Transaction success!");
