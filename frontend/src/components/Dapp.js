@@ -6,8 +6,6 @@ import { providers, utils } from "ethers";
 import { NoWalletDetected } from "./NoWalletDetected";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 
-import { JsonToTable } from "react-json-to-table";
-
 import ports from "../api/ports.json";
 import vessels from "../api/vessels.json";
 
