@@ -11,7 +11,7 @@
   overflow: initial;
   width: auto;
   border: 0px;
-  overflow: scroll;
+  overflow: auto;
   white-space: nowrap;
 }
 
