@@ -12,7 +12,7 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
     enum PolicyStatus {
         CREATED, // Policy is subscribed
         RUNNING, // Policy cover is started
-        COMPLETED, // Policy cover is finished without claim
+        COMPLETED, // Policy cover is fin6ished without claim
         CLAIMED, // Policy is claimed, waiting for pay out
         PAIDOUT // Claim is paid out
     }
@@ -90,10 +90,13 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
     //Enable anyone to send eth to the smart contract
     receive() external payable { }
 
-    constructor() public {
+    constructor(address _linkTokenAddress) public {
         admin = msg.sender;
-        // Error on tests -> Transaction reverted: function call to a non-contract account
-        //setPublicChainlinkToken();
+        if (_linkTokenAddress == address(0)) {
+            setPublicChainlinkToken();
+        } else {
+            setChainlinkToken(_linkTokenAddress);
+        }
     }
 
     /**********  PUBLIC FUNCTIONS **********/
@@ -199,6 +202,22 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         return updateTimer;
     }
 
+    function getTotalPremiums() public view returns(uint256) {
+        uint total = 0;
+        for( uint i=0; i<addrPolicies.length; i++){
+            total += policies[addrPolicies[i]].coverage.premium;
+        }
+        return total;
+    }
+
+    function getTotalCapitalInsured() public view returns(uint256) {
+        uint total = 0;
+        for( uint i=0; i<addrPolicies.length; i++){
+            total += policies[addrPolicies[i]].ship.shipmentValue;
+        }
+        return total;
+    }
+
     /**********  SET FUNCTIONS **********/
 
     // Set up weather oracle datas
@@ -272,30 +291,27 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
     /**********  CLAIMS FUNCTIONS **********/
 
     // TODO make this function internal
-    function UpdateContracts() public onlyOwner {
+    function UpdateContracts() public {
         for (uint256 policiesIndex = 0; policiesIndex < addrPolicies.length; policiesIndex++) {
             address addr = addrPolicies[policiesIndex];
-            Policy memory policy = policies[addr];
+            Policy storage policy = policies[addr];
 
-              // Update all policies status
-            if (policy.coverage.startDate >= block.timestamp && policy.coverage.endDate < block.timestamp) {
+            // Update all policies status
+            if ((policy.coverage.startDate <= block.timestamp && policy.coverage.endDate >= block.timestamp) && (policy.coverage.status==PolicyStatus.CREATED)) {
               policy.coverage.status = PolicyStatus.RUNNING;
-            } else if (policy.coverage.endDate >= block.timestamp) {
+            } else if ((policy.coverage.endDate < block.timestamp) && (policy.coverage.status==PolicyStatus.RUNNING)) {
               policy.coverage.status = PolicyStatus.COMPLETED;
             }
 
             if (policy.coverage.status == PolicyStatus.RUNNING) {
               // Request weather data to Chainlink
               Chainlink.Request memory request = buildChainlinkRequest(weatherJobId, address(this), this.receiveWeatherData.selector);
-              // Request datas from API : coordinate(lat, lng) and gust
-              // TO DO
-              request.add("gust", "");
+
+              request.add("uuid", policy.ship.id);
               // Sends the request
               bytes32 requestId = sendChainlinkRequestTo(weatherOracle, request, weatherFee);
               requestToPolicyAddr[requestId] = addr;
-            } else if (policy.coverage.status == PolicyStatus.CLAIMED) {
-              payOut(addr);
-            }
+            } 
         }
     }
 
@@ -313,6 +329,7 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         }
         if (policy.incidents >= incidentsThreshold /* + Should be at end port? */) {
             policy.coverage.status = PolicyStatus.CLAIMED;
+            payOut(addr);
         }
     }
 
@@ -321,16 +338,17 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
         Policy memory policy = policies[_beneficiary];
         // Trigger claiming process using pre determined threshold
         if (policy.weatherData.gust > policy.coverage.gustThreshold) {
-            policy.coverage.status = PolicyStatus.CLAIMED;
             return true;
         }
     }
 
-    function payOut(address _beneficiary) public payable onlyOwner {
+    function payOut(address _beneficiary) public payable {
         // transfer funds to beneficiary
-        Policy memory policy = policies[_beneficiary];
-        (bool sent, bytes memory data) = _beneficiary.call{value: 10}("");
-        require(sent, "Failed to transfer insurance claim");
+        Policy storage policy = policies[_beneficiary];
+        //(bool sent, bytes memory data) = _beneficiary.call{value: policy.ship.shipmentValue}("");
+        //require(sent, "Failed to transfer insurance claim");
+        require(address(this).balance >= policy.ship.shipmentValue);
+        payable(_beneficiary).transfer(policy.ship.shipmentValue);
         // Set contract to PAIDOUT
         policy.coverage.status = PolicyStatus.PAIDOUT;
         emit PolicyPaidOut(_beneficiary, policy.policyId, policy.ship.shipmentValue);
@@ -341,7 +359,7 @@ contract DelayInsurance is ChainlinkClient, KeeperCompatibleInterface {
     function stringToBytes32(string memory source) private pure returns (bytes32 result) {
         bytes memory tempEmptyStringTest = bytes(source);
         if (tempEmptyStringTest.length == 0) {
-          return 0x0;
+            return 0x0;
         }
 
         assembly { // solhint-disable-line no-inline-assembly

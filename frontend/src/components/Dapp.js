@@ -501,7 +501,8 @@ export class Dapp extends React.Component {
           <button
             type="button"
             className="btn btn-primary btn-success"
-            onClick={() => this._updateContracts()}
+            onClick=
+            {() => this._updateContracts()}
           >
             Update Contracts
           </button>
@@ -683,6 +684,15 @@ export class Dapp extends React.Component {
         this.setState({ policyPrice: `${_policyPrice.toString()} Wei` });
     } catch (error) {
       console.log(error);
+      return;
+    }
+  }
+
+  async _updateContracts() {
+    try {
+      await insuranceContract.UpdateContracts();
+    } catch (error) {
+      console.log(error)
       return;
     }
   }
