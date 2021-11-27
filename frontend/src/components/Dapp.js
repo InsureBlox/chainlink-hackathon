@@ -335,8 +335,7 @@ export class Dapp extends React.Component {
 
     try {
       debugger
-      const provider = new ethers.providers.Web3Provider(window.ethereum)
-      const signer = provider.getSigner();
+      const signer = this._provider.getSigner();
       const chainId = await signer.getChainId();
       debugger
       if (chainId === '31337') overrides.chainId = '31337'
