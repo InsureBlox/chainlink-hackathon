@@ -459,7 +459,7 @@ export class Dapp extends React.Component {
           </div>
         </div>
 
-        <div>State</div>
+        {/* <div>State</div>
         <div>{process.env.REACT_APP_VESSEL_API_KEY}</div>
         {this.state.departureDate && (
           <div>
@@ -475,7 +475,7 @@ export class Dapp extends React.Component {
         )}
         <div className="word-break">
           <JsonToTable json={this.state} />
-        </div>
+        </div> */}
 
         <hr />
 
