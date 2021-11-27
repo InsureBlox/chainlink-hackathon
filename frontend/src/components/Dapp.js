@@ -10,11 +10,8 @@ import { NoWalletDetected } from "./NoWalletDetected";
 import { ConnectWallet } from "./ConnectWallet";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 
-import background from "../assets/sea.jpg"
-import claims from "../assets/claims.json"
+import claims from "../assets/claims.json";
 import { JsonToTable } from "react-json-to-table";
-
-import "../index.css";
 
 import ports from "../api/ports.json";
 import vessels from "../api/vessels.json";
@@ -41,7 +38,7 @@ export class Dapp extends React.Component {
       arrivalPort: "CHENNAI",
       arrivalDate: "2021-12-31",
       policyId: "",
-      policyStatus: ""
+      policyStatus: "",
     };
 
     this.state = this.initialState;
@@ -85,63 +82,11 @@ export class Dapp extends React.Component {
 
     return (
       <>
-
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-
-          <div class="container">
-            <a class="navbar-brand col-sm" href="#">
-              <b>⛈️ Ocean Storm</b> <h6 display="inline">by InsureBlox</h6>
-            </a>
-
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-            </button>
-
-            {/* <div> */}
-
-              <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav mr-auto">
-                  <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#">Link</a>
-                  </li>
-                  <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-expanded="false">
-                      Dropdown
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                      <a class="dropdown-item" href="#">Action</a>
-                      <a class="dropdown-item" href="#">Another action</a>
-                      <div class="dropdown-divider"></div>
-                      <a class="dropdown-item" href="#">Something else here</a>
-                    </div>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link disabled">Disabled</a>
-                  </li>
-                </ul>
-                <form class="form-inline my-2 my-lg-0">
-                  <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" />
-                  <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                </form>
-              </div>
-
-            {/* </div> */}
-
-          </div>
-
-        </nav>
-
-        <div className="jumbotron" style={{padding: '0', height: '6em', overflow: 'hidden'}}>
-          <img className="img-fluid" src={background} alt="" style={{width: '100%'}}/>
-        </div>
-
-      <div className="container p-4">
         <div className="row">
           <div className="col-12">
-              <h2>🚢 <b>Shipment Delay Policy</b></h2>
+            <h2>
+              🚢 <b>Shipment Delay Policy</b>
+            </h2>
           </div>
         </div>
 
@@ -149,10 +94,9 @@ export class Dapp extends React.Component {
 
         <div className="row">
           <div className="col-12">
-              <p>Subscribe to a Ocean Storm policy today!</p>
+            <p>Subscribe to a Ocean Storm policy today!</p>
           </div>
         </div>
-
 
         <div className="row">
           <div className="col-12">
@@ -167,19 +111,25 @@ export class Dapp extends React.Component {
                   className="form-control"
                   id="inputPolicyThreshold"
                   value={this.state.policyThreshold}
-                  onChange={(e) => this.setState({ policyThreshold: e.target.value })}
+                  onChange={(e) =>
+                    this.setState({ policyThreshold: e.target.value })
+                  }
                 />
               </div>
 
               <div className="col-sm-4">
-                <label htmlFor="inputIncidentsThreshold">Incidents Threshold</label>
+                <label htmlFor="inputIncidentsThreshold">
+                  Incidents Threshold
+                </label>
                 <input
                   type="number"
                   min="0"
                   className="form-control"
                   id="inputIncidentsThreshold"
                   value={this.state.incidentsThreshold}
-                  onChange={(e) => this.setState({ incidentsThreshold: e.target.value })}
+                  onChange={(e) =>
+                    this.setState({ incidentsThreshold: e.target.value })
+                  }
                 />
               </div>
 
@@ -192,24 +142,26 @@ export class Dapp extends React.Component {
                   id="inputKeepersInterval"
                   aria-describedby="keepersIntervalHelp"
                   value={this.state.keepersInterval}
-                  onChange={(e) => this.setState({ keepersInterval: e.target.value })}
+                  onChange={(e) =>
+                    this.setState({ keepersInterval: e.target.value })
+                  }
                 />
-                <small id="keepersIntervalHelp" className="form-text text-muted">
+                <small
+                  id="keepersIntervalHelp"
+                  className="form-text text-muted"
+                >
                   In seconds
                 </small>
               </div>
-
             </div>
 
             <button
               type="button"
               className="btn btn-info"
-              onClick=
-              {() => this._updateParameters()}
+              onClick={() => this._updateParameters()}
             >
               Update Parameters
             </button>
-
           </div>
         </div>
 
@@ -357,7 +309,8 @@ export class Dapp extends React.Component {
                   }
                 />
                 <button
-                  className={`btn ${this.state.departurePortObject
+                  className={`btn ${
+                    this.state.departurePortObject
                       ? "btn-primary"
                       : "btn-secondary"
                   }`}
@@ -570,8 +523,7 @@ export class Dapp extends React.Component {
           <button
             type="button"
             className="btn btn-primary btn-success"
-            onClick=
-            {() => this._updateContracts()}
+            onClick={() => this._updateContracts()}
           >
             Update Contracts
           </button>
@@ -581,14 +533,12 @@ export class Dapp extends React.Component {
           <button
             type="button"
             className="btn btn-primary"
-            onClick=
-            {() => this._pricePremium()}
+            onClick={() => this._pricePremium()}
           >
             Get Policy Price
           </button>
         </div>
-      </div>
-    </>
+      </>
     );
   }
 
@@ -661,7 +611,10 @@ export class Dapp extends React.Component {
   }
 
   _checkNetwork() {
-    if (window.ethereum.networkVersion === HARDHAT_NETWORK_ID || window.ethereum.networkVersion === KOVAN_NETWORK_ID) {
+    if (
+      window.ethereum.networkVersion === HARDHAT_NETWORK_ID ||
+      window.ethereum.networkVersion === KOVAN_NETWORK_ID
+    ) {
       return true;
     }
 
@@ -688,20 +641,22 @@ export class Dapp extends React.Component {
     // we may change this soon
     const INSURANCE_NUMBER_DEFAULT = 200;
 
-    let insuredSum = Math.round(this.state.shipmentValue / INSURANCE_NUMBER_DEFAULT);
-    let overrides = { value: insuredSum }
+    let insuredSum = Math.round(
+      this.state.shipmentValue / INSURANCE_NUMBER_DEFAULT
+    );
+    let overrides = { value: insuredSum };
 
     try {
-      const provider = new providers.Web3Provider(window.ethereum)
+      const provider = new providers.Web3Provider(window.ethereum);
       const signer = provider.getSigner();
       const chainId = await signer.getChainId();
-      if (chainId === '31337') overrides.chainId = '31337'
+      if (chainId === "31337") overrides.chainId = "31337";
 
       await insuranceContract.subscribePolicy(
         this.state.shipId,
         this.state.shipmentValue,
-        (new Date(this.state.departureDate).getTime() / 1000),
-        (new Date(this.state.arrivalDate).getTime() / 1000),
+        new Date(this.state.departureDate).getTime() / 1000,
+        new Date(this.state.arrivalDate).getTime() / 1000,
         utils.formatBytes32String(this.state.departurePort),
         utils.formatBytes32String(this.state.arrivalPort),
         overrides
@@ -747,13 +702,15 @@ export class Dapp extends React.Component {
           _policyStatus = "UNKNOWN";
       }
 
-      if (false/* _policyId == 0 */) {
-        window.alert("You don't have policy registered or it is still being created.")
+      if (false /* _policyId == 0 */) {
+        window.alert(
+          "You don't have policy registered or it is still being created."
+        );
       } else {
         this.setState({ policyId: _policyId, policyStatus: _policyStatus });
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       this.setState({ transactionError: error });
       return;
     }
@@ -768,7 +725,7 @@ export class Dapp extends React.Component {
         this.state.policyThreshold
       );
     } catch (error) {
-      console.log(error)
+      console.log(error);
       this.setState({ transactionError: error });
       return;
     }
@@ -778,22 +735,28 @@ export class Dapp extends React.Component {
     try {
       await insuranceContract.UpdateContracts();
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return;
     }
   }
 
   async _pricePremium() {
-    let _policyPrice
+    let _policyPrice;
     try {
-      _policyPrice = await insuranceContract.pricePremium({
-        id: this.state.shipId,
-        shipmentValue: this.state.shipmentValue
-      }, 0, 0, 0, 0);
-      if(_policyPrice)
+      _policyPrice = await insuranceContract.pricePremium(
+        {
+          id: this.state.shipId,
+          shipmentValue: this.state.shipmentValue,
+        },
+        0,
+        0,
+        0,
+        0
+      );
+      if (_policyPrice)
         this.setState({ policyPrice: `${_policyPrice.toString()} Wei` });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return;
     }
   }
