@@ -1,8 +1,11 @@
 import React from "react";
 import background from "../assets/sea.jpg";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export function Navigation() {
+  const navigate = useNavigate();
+
   return (
     <div>
       <nav className="navbar navbar-expand navbar-dark bg-dark">
