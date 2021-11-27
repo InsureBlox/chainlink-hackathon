@@ -20,6 +20,16 @@ export class Contracts extends React.Component {
     }).format(new Date(dateString));
   }
 
+  formatVote(number) {
+    if (number === -1) {
+      return <div className="text-danger">Denied</div>;
+    }
+    if (number === 1) {
+      return <div className="text-success">Accepted</div>;
+    }
+    return <div>No valid vote</div>;
+  }
+
   render() {
     if (window.ethereum === undefined || !this.props.selectedAddress) {
       return <NoWalletDetected />;
@@ -61,7 +71,7 @@ export class Contracts extends React.Component {
                     <td>{this.formatDate(contract.purchaseDate)}</td>
                     <td>{this.formatDate(contract.expiry)}</td>
                     <td>{contract.claimId}</td>
-                    <td>{contract.vote}</td>
+                    <td>{this.formatVote(contract.vote)}</td>
                     <td>{contract.status}</td>
                   </tr>
                 );
