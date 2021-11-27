@@ -12,6 +12,14 @@ export class Contracts extends React.Component {
     this.state = this.initialState;
   }
 
+  formatDate(dateString) {
+    return new Intl.DateTimeFormat({
+      month: "2-digit",
+      day: "2-digit",
+      year: "numeric",
+    }).format(new Date(dateString));
+  }
+
   render() {
     if (window.ethereum === undefined || !this.props.selectedAddress) {
       return <NoWalletDetected />;
@@ -42,20 +50,8 @@ export class Contracts extends React.Component {
                     <td>{contract.address}</td>
                     <td>{contract.sumAssured.hex}</td>
                     <td>{contract.currency}</td>
-                    <td>
-                      {new Date(contract.purchaseDate).toLocaleDateString({
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                      })}
-                    </td>
-                    <td>
-                      {new Date(contract.expiry).toLocaleDateString({
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                      })}
-                    </td>
+                    <td>{this.formatDate(contract.purchaseDate)}</td>
+                    <td>{this.formatDate(contract.expiry)}</td>
                     <td>{contract.claimId}</td>
                     <td>{contract.vote}</td>
                     <td>{contract.status}</td>
