@@ -47,7 +47,14 @@ export class Contracts extends React.Component {
                 return (
                   <tr key={index}>
                     <td>{contract.coverId.hex}</td>
-                    <td>{contract.address}</td>
+                    <td>
+                      <a
+                        target="_blank"
+                        href={`https://kovan.etherscan.io/tx/${contract.address}`}
+                      >
+                        View
+                      </a>
+                    </td>
                     <td>{contract.sumAssured.hex}</td>
                     <td>{contract.currency}</td>
                     <td>{this.formatDate(contract.purchaseDate)}</td>
