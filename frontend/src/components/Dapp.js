@@ -149,7 +149,7 @@ export class Dapp extends React.Component {
 
         <div className="row">
           <div className="col-12">
-            <p>Subscribe to a shipment delay policy today!</p>
+              <p>Subscribe to a Ocean Storm policy today!</p>
           </div>
         </div>
 
@@ -321,7 +321,7 @@ export class Dapp extends React.Component {
               </small>
             </div>
             <div className="col-sm-6">
-              <label htmlFor="inputShipmentValue">Shipment Value</label>
+              <label htmlFor="inputShipmentValue">Amount Insured</label>
               <input
                 type="text"
                 className="form-control"
@@ -334,7 +334,7 @@ export class Dapp extends React.Component {
                 }
               />
               <small id="shipmentValueHelp" className="form-text text-muted">
-                Type in the shipment value
+                The shipment value you want to insure
               </small>
             </div>
           </div>
@@ -552,7 +552,7 @@ export class Dapp extends React.Component {
             className="btn btn-primary"
             onClick={(event) => this._subscribePolicy(event)}
           >
-            Subscribe Policy
+            Buy Policy
           </button>
         </div>
 
