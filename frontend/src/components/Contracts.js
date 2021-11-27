@@ -46,7 +46,7 @@ export class Contracts extends React.Component {
               {contracts.map((contract, index) => {
                 return (
                   <tr key={index}>
-                    <td>{contract.coverId.hex}</td>
+                    <td>{parseInt(contract.coverId.hex, 16)}</td>
                     <td>
                       <a
                         target="_blank"
@@ -56,7 +56,7 @@ export class Contracts extends React.Component {
                         View
                       </a>
                     </td>
-                    <td>{contract.sumAssured.hex}</td>
+                    <td>{parseInt(contract.sumAssured.hex, 16)}</td>
                     <td>{contract.currency}</td>
                     <td>{this.formatDate(contract.purchaseDate)}</td>
                     <td>{this.formatDate(contract.expiry)}</td>
