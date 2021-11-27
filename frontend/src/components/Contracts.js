@@ -32,7 +32,7 @@ export class Contracts extends React.Component {
             <thead>
               <tr>
                 <th>Cover Id</th>
-                <th>Adress</th>
+                <th>Address</th>
                 <th>Sum Assured</th>
                 <th>Currency</th>
                 <th>Purchase Date</th>
