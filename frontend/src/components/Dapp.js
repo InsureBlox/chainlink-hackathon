@@ -57,7 +57,6 @@ export class Dapp extends React.Component {
 
   render() {
     if (window.ethereum === undefined || !this.props.selectedAddress) {
-      // ToDo: Navigate to /home
       return <NoWalletDetected />;
     }
 
