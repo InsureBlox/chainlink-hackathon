@@ -554,7 +554,7 @@ export class Dapp extends React.Component {
           </button>
         </div>
 
-        <div>
+        <div className="form-group">
           <button
             type="button"
             className="btn btn-primary btn-success"
@@ -563,6 +563,18 @@ export class Dapp extends React.Component {
             Update Policy Status
           </button>
         </div>
+
+        <div className="form-group">
+          <button
+            type="button"
+            className="btn btn-primary btn-success"
+            onClick=
+            {() => this._updateContracts()}
+          >
+            Update Contracts
+          </button>
+        </div>
+
       </div>
     </>
     );
@@ -724,9 +736,7 @@ export class Dapp extends React.Component {
       }
 
       if (false/* _policyId == 0 */) {
-        window.alert(
-          "You don't have policy registered or it is still being created."
-        );
+        window.alert("You don't have policy registered or it is still being created.")
       } else {
         this.setState({ policyId: _policyId, policyStatus: _policyStatus });
       }
@@ -748,6 +758,15 @@ export class Dapp extends React.Component {
     } catch (error) {
       console.log(error)
       this.setState({ transactionError: error });
+      return;
+    }
+  }
+
+  async _updateContracts() {
+    try {
+      await insuranceContract.UpdateContracts();
+    } catch (error) {
+      console.log(error)
       return;
     }
   }
