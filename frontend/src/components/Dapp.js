@@ -577,6 +577,16 @@ export class Dapp extends React.Component {
           </button>
         </div>
 
+        <div className="form-group">
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick=
+            {() => this._pricePremium()}
+          >
+            Get Policy Price
+          </button>
+        </div>
       </div>
     </>
     );
@@ -767,6 +777,21 @@ export class Dapp extends React.Component {
   async _updateContracts() {
     try {
       await insuranceContract.UpdateContracts();
+    } catch (error) {
+      console.log(error)
+      return;
+    }
+  }
+
+  async _pricePremium() {
+    let _policyPrice
+    try {
+      _policyPrice = await insuranceContract.pricePremium({
+        id: this.state.shipId,
+        shipmentValue: this.state.shipmentValue
+      }, 0, 0, 0, 0);
+      if(_policyPrice)
+        this.setState({ policyPrice: `${_policyPrice.toString()} Wei` });
     } catch (error) {
       console.log(error)
       return;
