@@ -13,7 +13,8 @@ describe('Delay Insurance test', function () {
   // Instantiate contract before each test
   beforeEach(async function () {
     DelayInsurance = await ethers.getContractFactory("DelayInsurance")
-    delayInsurance = await DelayInsurance.deploy()
+    const admin = ethers.getSigners()
+    delayInsurance = await DelayInsurance.deploy("0xa36085F69e2889c224210F603D836748e7dC0088")
     await delayInsurance.deployed();
   });
 
@@ -57,61 +58,24 @@ describe('Delay Insurance test', function () {
   });
 
   it('should verify incidents', async function () {
-    const [admin, customer1, customer2] = await ethers.getSigners()
+    const [customer] = await ethers.getSigners()
 
     // Set very old startDate and a future endDate to make sure the vessel journey is currently happening
     let startDate = 974448412; // startDate 17/11/2000
-    let endDate = 1763366812; // startDate 17/11/2025
+    let endDate = 1451520000; // endDate 31/12/2015
 
-    // Get customer1 balance before insurance claim
-    const customer1Balance1 = await provider.getBalance(customer1.address);
-    console.log("customer1 balance: " + ethers.utils.formatEther(customer1Balance1))
-
-    // Trigger subscribePolicy method
-    await delayInsurance
-      .connect(customer1)
-      .subscribePolicy("shipId_customer1", shipmentValue, startDate, endDate, 1000, 2000, { from: customer1.address, value: pricePremium })
-
-    // Trigger UpdateContracts method manually - this is being triggered by Chainlink Keepers
-    await delayInsurance.connect(admin).UpdateContracts();
-
-    const policyStatus = await delayInsurance.connect(customer1).getPolicyStatus();
-    assert.equal(policyStatus, "RUNNING")
-
-    // Get customer1 balance after insurance claim
-    const customer1Balance2 = await provider.getBalance(customer1.address);
-    console.log("customer1 balance after UpdateContracts: " + ethers.utils.formatEther(customer1Balance2))
-
-    // Test Incomplete - WIP
-  });
-
-  it('should pay out', async function () {
-    const [admin, customer] = await ethers.getSigners()
-
-    // Set very old startDate and a future endDate to make sure the vessel journey is currently happening
-    let startDate = 974448412; // startDate 17/11/2000
-    let endDate = 1763366812; // startDate 17/11/2025
-
-    // Trigger subscribePolicy method
+    // Trigger subscribePolicy method for customer1 & customer2
     await delayInsurance
       .connect(customer)
-      .subscribePolicy("shipId_customer1", shipmentValue, startDate, endDate, 1000, 2000, { from: customer.address, value: pricePremium })
+      .subscribePolicy("shipId_customer", shipmentValue, startDate, endDate, 1000, 2000, { from: customer.address, value: pricePremium })
 
-    // Get customer1 balance before insurance claim
-    const customerBalance1 = await provider.getBalance(customer.address);
-    console.log("customer balance: " + ethers.utils.formatEther(customerBalance1))
-
-    // Trigger UpdateContracts method manually - this is being triggered by Chainlink Keepers
-    await delayInsurance.connect(admin).payOut(customer.address);
+    // Trigger UpdateContracts method manually - this is being triggered by Chainlink Keepers6
+    await delayInsurance.connect(customer).UpdateContracts();
 
     const policyStatus = await delayInsurance.connect(customer).getPolicyStatus();
-
-    // Get customer1 balance after insurance claim
-    const customerBalance2 = await provider.getBalance(customer.address);
-    console.log("customer balance after UpdateContracts: " + ethers.utils.formatEther(customerBalance2))
-
-    assert.equal(customerBalance1.toString(), customerBalance2.toString())
+    assert.equal(policyStatus, 2);
   });
+
 
   it('Should get the policy gust threshold', async function () {
     const [customer] = await ethers.getSigners()
@@ -124,21 +88,58 @@ describe('Delay Insurance test', function () {
     const policyThreshold = await delayInsurance.connect(customer).getGustThreshold();
     const calculThreshold = await delayInsurance.connect(customer).calculateGustThreshold(0,0,0,0);
 
+
     assert.equal(calculThreshold.toString(), policyThreshold.toString());
   });
 
-  it('Should get the policy status', async function () {
-    const [customer] = await ethers.getSigners()
+  it('Should get the total amount of premiums', async function () {
+    const [customer1, customer2, customer3] = await ethers.getSigners()
 
-    // Trigger subscribePolicy method
-    await delayInsurance
-      .connect(customer)
-      .subscribePolicy("shipId_customer", shipmentValue, 1637386311, 1637559188, 1000, 2000, { from: customer.address, value: pricePremium })
+    // Trigger subscribePolicy method using mocked data and customer1 1
+    let subscribePolicy1 = delayInsurance.connect(customer1).subscribePolicy("shipId1", shipmentValue, 1637386300, 1637559199, 1000, 2000, { from: customer1.address, value: pricePremium })
+    await expect(subscribePolicy1).to.emit(delayInsurance, 'PolicySubscription').withArgs(customer1.address, 0);
 
-    console.log(await delayInsurance.connect(customer).getPolicyStatus());
-    const policyStatus = await delayInsurance.connect(customer).getPolicyStatus();
+    // Trigger subscribePolicy method using mocked data and customer1 2
+    let subscribePolicy2 = delayInsurance.connect(customer2).subscribePolicy("shipId2", shipmentValue, 1637386322, 16375591755, 1000, 2000, { from: customer2.address, value: pricePremium })
+    await expect(subscribePolicy2).to.emit(delayInsurance, 'PolicySubscription').withArgs(customer2.address, 1);
 
-    assert.equal(policyStatus, "CREATED");
+    // Trigger subscribePolicy method using mocked data and customer1 3
+    let subscribePolicy3 = delayInsurance.connect(customer3).subscribePolicy("shipId3", shipmentValue, 1637386311, 1637559188, 1000, 2000, { from: customer3.address, value: pricePremium })
+    await expect(subscribePolicy3).to.emit(delayInsurance, 'PolicySubscription').withArgs(customer3.address, 2);
+
+    const total = await delayInsurance.connect(customer1).getTotalPremiums()
+    assert.equal(total.toNumber(), 3*pricePremium);
   });
 
+  it('Should get the total capital insured', async function () {
+    const [customer1, customer2, customer3] = await ethers.getSigners()
+
+    // Trigger subscribePolicy method using mocked data and customer1 1
+    let subscribePolicy1 = delayInsurance.connect(customer1).subscribePolicy("shipId1", shipmentValue, 1637386300, 1637559199, 1000, 2000, { from: customer1.address, value: pricePremium })
+    await expect(subscribePolicy1).to.emit(delayInsurance, 'PolicySubscription').withArgs(customer1.address, 0);
+
+    // Trigger subscribePolicy method using mocked data and customer1 2
+    let subscribePolicy2 = delayInsurance.connect(customer2).subscribePolicy("shipId2", shipmentValue, 1637386322, 16375591755, 1000, 2000, { from: customer2.address, value: pricePremium })
+    await expect(subscribePolicy2).to.emit(delayInsurance, 'PolicySubscription').withArgs(customer2.address, 1);
+
+    // Trigger subscribePolicy method using mocked data and customer1 3
+    let subscribePolicy3 = delayInsurance.connect(customer3).subscribePolicy("shipId3", shipmentValue, 1637386311, 1637559188, 1000, 2000, { from: customer3.address, value: pricePremium })
+    await expect(subscribePolicy3).to.emit(delayInsurance, 'PolicySubscription').withArgs(customer3.address, 2);
+
+    const total = await delayInsurance.connect(customer1).getTotalCapitalInsured()
+    assert.equal(total.toNumber(), 3*shipmentValue);
+  });
+
+  it('Should pay when th payout is triggered', async function () {
+    const [customer1, customer2] = await ethers.getSigners();
+    //customer1.sendTransaction(delayInsurance.address, shipmentValue);
+    await delayInsurance.connect(customer2).subscribePolicy("shipId_customer", shipmentValue, 1637386311, 1637559188, 1000, 2000, { from: customer2.address, value: pricePremium });
+    const balanceBefore = (await provider.getBalance(customer2.address));
+    await delayInsurance.connect(customer2).payOut(customer2.address);
+    const balanceAfter = await provider.getBalance(customer2.address);
+    console.log("Before: ", balanceBefore.toString());
+    console.log("After: ", balanceAfter.toString());
+    console.log("Difference: ", balanceBefore-balanceAfter);
+
+  });
 });
