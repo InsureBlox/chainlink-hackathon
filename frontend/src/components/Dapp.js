@@ -25,12 +25,12 @@ export class Dapp extends React.Component {
       selectedAddress: undefined,
       transactionError: undefined,
       networkError: undefined,
-      shipId: "",
-      shipmentValue: "",
-      departurePort: "",
-      departureDate: "",
-      arrivalPort: "",
-      arrivalDate: "",
+      shipId: "4ae72971-77b3-9167-973e-1da1c773ad41",
+      shipmentValue: "1000",
+      departurePort: "MALAGA",
+      departureDate: "2021-12-01",
+      arrivalPort: "CHENNAI",
+      arrivalDate: "2021-12-31",
       policyId: "",
       policyStatus: ""
     };
@@ -324,23 +324,31 @@ export class Dapp extends React.Component {
       return;
     }
 
-    // TODO 
+    // TODO
     // customer shoudn't be able to change this value
-    // hardvalue for a catnat event (occure 1/200) same as SmartContract 
+    // hardvalue for a catnat event (occure 1/200) same as SmartContract
     // we may change this soon
     const INSURANCE_NUMBER_DEFAULT = 200;
 
     let insuredSum = Math.round(this.state.shipmentValue / INSURANCE_NUMBER_DEFAULT);
+    let overrides = { value: insuredSum }
 
     try {
+      debugger
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
+      const signer = provider.getSigner();
+      const chainId = await signer.getChainId();
+      debugger
+      if (chainId === '31337') overrides.chainId = '31337'
+
       await insuranceContract.subscribePolicy(
         this.state.shipId,
         this.state.shipmentValue,
         (new Date(this.state.departureDate).getTime() / 1000),
         (new Date(this.state.arrivalDate).getTime() / 1000),
-        this.state.departurePort,
-        this.state.arrivalPort,
-        { value: insuredSum }
+        ethers.utils.formatBytes32String(this.state.departurePort),
+        ethers.utils.formatBytes32String(this.state.arrivalPort),
+        overrides
       );
 
       window.alert("Transaction success!")
