@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 
-import { ethers } from "ethers";
+import { Contract, providers, utils } from "ethers";
 
 import DelayInsuranceArtifact from "../contracts/InsuranceContract.json";
 import contractAddress from "../contracts/contract-address.json";
@@ -9,6 +9,10 @@ import contractAddress from "../contracts/contract-address.json";
 import { NoWalletDetected } from "./NoWalletDetected";
 import { ConnectWallet } from "./ConnectWallet";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
+
+import background from "../assets/sea.jpg"
+import claims from "../assets/claims.json"
+import { JsonToTable } from "react-json-to-table";
 
 import "../index.css";
 
@@ -29,18 +33,15 @@ export class Dapp extends React.Component {
       selectedAddress: undefined,
       transactionError: undefined,
       networkError: undefined,
-      policyThreshold: 1,
-      incidentsThreshold: 2,
-      keepersInterval: 60,
-      shipObject: undefined,
-      shipName: "",
-      shipId: "",
-      shipmentValue: "",
-      departurePortObject: undefined,
-      departurePort: "",
-      departureDate: "",
-      arrivalPort: "",
-      arrivalDate: "",
+      shipId: "4ae72971-77b3-9167-973e-1da1c773ad41",
+      shipName: "QUEEN MARY",
+      shipmentValue: "1000",
+      departurePort: "MALAGA",
+      departureDate: "2021-12-01",
+      arrivalPort: "CHENNAI",
+      arrivalDate: "2021-12-31",
+      policyId: "",
+      policyStatus: ""
     };
 
     this.state = this.initialState;
@@ -83,14 +84,75 @@ export class Dapp extends React.Component {
     }
 
     return (
+      <>
+
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+
+          <div class="container">
+            <a class="navbar-brand col-sm" href="#">
+              <b>⛈️ Ocean Storm</b> <h6 display="inline">by InsureBlox</h6>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            {/* <div> */}
+
+              <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                  <li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">Link</a>
+                  </li>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-expanded="false">
+                      Dropdown
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                      <a class="dropdown-item" href="#">Action</a>
+                      <a class="dropdown-item" href="#">Another action</a>
+                      <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" href="#">Something else here</a>
+                    </div>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link disabled">Disabled</a>
+                  </li>
+                </ul>
+                <form class="form-inline my-2 my-lg-0">
+                  <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" />
+                  <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                </form>
+              </div>
+
+            {/* </div> */}
+
+          </div>
+
+        </nav>
+
+        <div className="jumbotron" style={{padding: '0', height: '6em', overflow: 'hidden'}}>
+          <img className="img-fluid" src={background} alt="" style={{width: '100%'}}/>
+        </div>
+
       <div className="container p-4">
         <div className="row">
           <div className="col-12">
-            <h1>⛈️ Ocean Storm by InsureBlox</h1>
+              <h2>🚢 <b>Shipment Delay Policy</b></h2>
           </div>
         </div>
 
         <hr />
+
+        <div className="row">
+          <div className="col-12">
+              <p>Subscribe to a Ocean Storm policy today!</p>
+          </div>
+        </div>
+
 
         <div className="row">
           <div className="col-12">
@@ -259,7 +321,7 @@ export class Dapp extends React.Component {
               </small>
             </div>
             <div className="col-sm-6">
-              <label htmlFor="inputShipmentValue">Shipment Value</label>
+              <label htmlFor="inputShipmentValue">Amount Insured</label>
               <input
                 type="text"
                 className="form-control"
@@ -272,7 +334,7 @@ export class Dapp extends React.Component {
                 }
               />
               <small id="shipmentValueHelp" className="form-text text-muted">
-                Type in the shipment value
+                The shipment value you want to insure
               </small>
             </div>
           </div>
@@ -478,7 +540,9 @@ export class Dapp extends React.Component {
             {(new Date(this.state.arrivalDate).getTime() / 1000).toString()}
           </div>
         )}
-        <div className="word-break">{JSON.stringify(this.state)}</div>
+        <div className="word-break">
+          <JsonToTable json={this.state} />
+        </div>
 
         <hr />
 
@@ -488,11 +552,11 @@ export class Dapp extends React.Component {
             className="btn btn-primary"
             onClick={(event) => this._subscribePolicy(event)}
           >
-            Subscribe Policy
+            Buy Policy
           </button>
         </div>
 
-        <div>
+        <div className="form-group">
           <button
             type="button"
             className="btn btn-primary btn-success"
@@ -501,7 +565,30 @@ export class Dapp extends React.Component {
             Update Policy Status
           </button>
         </div>
+
+        <div className="form-group">
+          <button
+            type="button"
+            className="btn btn-primary btn-success"
+            onClick=
+            {() => this._updateContracts()}
+          >
+            Update Contracts
+          </button>
+        </div>
+
+        <div className="form-group">
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick=
+            {() => this._pricePremium()}
+          >
+            Get Policy Price
+          </button>
+        </div>
       </div>
+    </>
     );
   }
 
@@ -544,9 +631,9 @@ export class Dapp extends React.Component {
   }
 
   async _intializeEthers() {
-    this._provider = new ethers.providers.Web3Provider(window.ethereum);
+    this._provider = new providers.Web3Provider(window.ethereum);
 
-    insuranceContract = await new ethers.Contract(
+    insuranceContract = await new Contract(
       contractAddress.Contract,
       DelayInsuranceArtifact.abi,
       this._provider.getSigner(0)
@@ -601,19 +688,23 @@ export class Dapp extends React.Component {
     // we may change this soon
     const INSURANCE_NUMBER_DEFAULT = 200;
 
-    let insuredSum = Math.round(
-      this.state.shipmentValue / INSURANCE_NUMBER_DEFAULT
-    );
+    let insuredSum = Math.round(this.state.shipmentValue / INSURANCE_NUMBER_DEFAULT);
+    let overrides = { value: insuredSum }
 
     try {
+      const provider = new providers.Web3Provider(window.ethereum)
+      const signer = provider.getSigner();
+      const chainId = await signer.getChainId();
+      if (chainId === '31337') overrides.chainId = '31337'
+
       await insuranceContract.subscribePolicy(
         this.state.shipId,
         this.state.shipmentValue,
-        new Date(this.state.departureDate).getTime() / 1000,
-        new Date(this.state.arrivalDate).getTime() / 1000,
-        this.state.departurePort,
-        this.state.arrivalPort,
-        { value: insuredSum }
+        (new Date(this.state.departureDate).getTime() / 1000),
+        (new Date(this.state.arrivalDate).getTime() / 1000),
+        utils.formatBytes32String(this.state.departurePort),
+        utils.formatBytes32String(this.state.arrivalPort),
+        overrides
       );
       window.alert("Transaction success!");
     } catch (error) {
@@ -656,10 +747,8 @@ export class Dapp extends React.Component {
           _policyStatus = "UNKNOWN";
       }
 
-      if (_policyId == 0) {
-        window.alert(
-          "You don't have policy registered or it is still being created."
-        );
+      if (false/* _policyId == 0 */) {
+        window.alert("You don't have policy registered or it is still being created.")
       } else {
         this.setState({ policyId: _policyId, policyStatus: _policyStatus });
       }
@@ -681,6 +770,30 @@ export class Dapp extends React.Component {
     } catch (error) {
       console.log(error)
       this.setState({ transactionError: error });
+      return;
+    }
+  }
+
+  async _updateContracts() {
+    try {
+      await insuranceContract.UpdateContracts();
+    } catch (error) {
+      console.log(error)
+      return;
+    }
+  }
+
+  async _pricePremium() {
+    let _policyPrice
+    try {
+      _policyPrice = await insuranceContract.pricePremium({
+        id: this.state.shipId,
+        shipmentValue: this.state.shipmentValue
+      }, 0, 0, 0, 0);
+      if(_policyPrice)
+        this.setState({ policyPrice: `${_policyPrice.toString()} Wei` });
+    } catch (error) {
+      console.log(error)
       return;
     }
   }
