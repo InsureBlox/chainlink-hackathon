@@ -5,16 +5,23 @@ import { useNavigate } from "react-router-dom";
 import icon from "../assets/favicon.png";
 
 export function Navigation() {
+  // eslint-disable-next-line
   const navigate = useNavigate();
 
   return (
     <div>
       <nav className="navbar navbar-expand navbar-dark bg-dark">
         <div className="container">
-          <a className="navbar-brand col-sm" href="#">
+          <a className="navbar-brand col-sm" href="/">
             <b className="center-vertical" style={{ marginLeft: "-3px" }}>
-              <img className="mr-1" src={icon} width={32} height={32} /> Ocean
-              Storm
+              <img
+                className="mr-1"
+                src={icon}
+                width={32}
+                height={32}
+                alt="image_logo"
+              />{" "}
+              Ocean Storm
             </b>
             <h6 display="inline">by InsureBlox</h6>
           </a>
@@ -50,7 +57,7 @@ export function Navigation() {
           height: "6em",
           overflow: "hidden",
           marginBottom: "2rem",
-          backgroundColor: "#e9ecef",
+          backgroundColor: "#e9ecef"
         }}
       >
         <img

@@ -1,6 +1,6 @@
 import React from "react";
 import { NoWalletDetected } from "./NoWalletDetected";
-import contracts from "../assets/contracts.json";
+// import contracts from "../assets/contracts.json";
 import "./contracts.css";
 
 export class Contracts extends React.Component {
@@ -19,7 +19,7 @@ export class Contracts extends React.Component {
     return new Intl.DateTimeFormat({
       month: "2-digit",
       day: "2-digit",
-      year: "numeric",
+      year: "numeric"
     }).format(new Date(dateString));
   }
 
@@ -34,28 +34,30 @@ export class Contracts extends React.Component {
   }
 
   async componentDidMount() {
-    const policies = await this.state.contract.getAllPolicies()
-    this.setState({ policies })
+    const policies = await this.state.contract.getAllPolicies();
+    this.setState({ policies });
     this._getTotalPremiums();
     this._getTotalCapitalInsured();
   }
 
   async _getTotalCapitalInsured() {
     try {
-      const totalCapitalInsured = await this.props.insuranceContract.getTotalCapitalInsured();
+      const totalCapitalInsured =
+        await this.props.insuranceContract.getTotalCapitalInsured();
       this.setState({ totalCapitalInsured });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return;
     }
   }
 
   async _getTotalPremiums() {
     try {
-      const totalPremiums = await this.props.insuranceContract.getTotalPremiums();
+      const totalPremiums =
+        await this.props.insuranceContract.getTotalPremiums();
       this.setState({ totalPremiums });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return;
     }
   }
@@ -67,27 +69,29 @@ export class Contracts extends React.Component {
 
     return (
       <div>
-        <h1><b>Total Value Insured</b></h1>
+        <h1>
+          <b>Total Value Insured</b>
+        </h1>
         <hr />
 
-        <div class="container">
-          <div class="row">
-            <div class="col text-light bg-dark mb-2 p-3 rounded-sm shadow border border-white">
+        <div className="container">
+          <div className="row">
+            <div className="col text-light bg-dark mb-2 p-3 rounded-sm shadow border border-white">
               Ocean Storm protocol has earned
               <h2>{parseFloat(this.state.totalPremiums) / 1e18} ETH</h2>
               in paid policy premiums
             </div>
           </div>
 
-          <div class="row">
-            <div class="col text-light bg-info mb-2 p-3 rounded-sm shadow border border-white">
+          <div className="row">
+            <div className="col text-light bg-info mb-2 p-3 rounded-sm shadow border border-white">
               Ocean Storm is now insuring
               <h2>{parseFloat(this.state.totalCapitalInsured) / 1e18} ETH</h2>
               in capital value
             </div>
           </div>
 
-          <div class="row">
+          <div className="row">
             <div className="col form-group p-0">
               <button
                 type="button"
@@ -102,7 +106,9 @@ export class Contracts extends React.Component {
 
         <br />
 
-        <h1><b>Status of our Policies</b></h1>
+        <h1>
+          <b>Status of our Policies</b>
+        </h1>
         <hr />
 
         <div className="tableWrapper">
@@ -124,7 +130,9 @@ export class Contracts extends React.Component {
                     <tr key={index}>
                       <td>{policy.policyId.toString()}</td>
                       <td>{policy.ship.id}</td>
-                      <td>{parseFloat(policy.ship.shipmentValue) / 1e18} ETH</td>
+                      <td>
+                        {parseFloat(policy.ship.shipmentValue) / 1e18} ETH
+                      </td>
                       <td>{policy.weatherData.gust.toString()}</td>
                       <td>{policy.weatherData.location}</td>
                       <td>{policy.incidents}</td>
