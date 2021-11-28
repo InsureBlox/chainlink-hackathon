@@ -6,7 +6,7 @@ import { providers, utils } from "ethers";
 import { NoWalletDetected } from "./NoWalletDetected";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 
-import { JsonToTable } from "react-json-to-table";
+// import { JsonToTable } from "react-json-to-table";
 
 import ports from "../api/ports.json";
 import vessels from "../api/vessels.json";
@@ -28,7 +28,7 @@ export class Dapp extends React.Component {
       arrivalPort: "CHENNAI",
       arrivalDate: "2021-12-31",
       policyId: "",
-      policyStatus: "",
+      policyStatus: ""
     };
 
     this.state = this.initialState;
@@ -173,7 +173,7 @@ export class Dapp extends React.Component {
                   onClick={() =>
                     this.setState({
                       shipName: "",
-                      shipObject: undefined,
+                      shipObject: undefined
                     })
                   }
                 >
@@ -193,15 +193,16 @@ export class Dapp extends React.Component {
                       !this.state.shipObject
                     );
                   })
-                  .map((vessel) => {
+                  .map((vessel, index) => {
                     return (
                       <div
+                        key={index}
                         className="dropdown-item"
                         onClick={() =>
                           this.setState({
                             shipName: vessel.name,
                             shipId: vessel.uuid,
-                            shipObject: vessel,
+                            shipObject: vessel
                           })
                         }
                       >
@@ -274,7 +275,7 @@ export class Dapp extends React.Component {
                   onClick={() =>
                     this.setState({
                       departurePort: "",
-                      departurePortObject: undefined,
+                      departurePortObject: undefined
                     })
                   }
                 >
@@ -295,14 +296,15 @@ export class Dapp extends React.Component {
                       !this.state.departurePortObject
                     );
                   })
-                  .map((port) => {
+                  .map((port, index) => {
                     return (
                       <div
+                        key={index}
                         className="dropdown-item"
                         onClick={() =>
                           this.setState({
                             departurePort: port.port_name,
-                            departurePortObject: port,
+                            departurePortObject: port
                           })
                         }
                       >
@@ -363,7 +365,7 @@ export class Dapp extends React.Component {
                   onClick={() =>
                     this.setState({
                       arrivalPort: "",
-                      arrivalPortObject: undefined,
+                      arrivalPortObject: undefined
                     })
                   }
                 >
@@ -384,14 +386,15 @@ export class Dapp extends React.Component {
                       !this.state.arrivalPortObject
                     );
                   })
-                  .map((port) => {
+                  .map((port, index) => {
                     return (
                       <div
+                        key={index}
                         className="dropdown-item"
                         onClick={() =>
                           this.setState({
                             arrivalPort: port.port_name,
-                            arrivalPortObject: port,
+                            arrivalPortObject: port
                           })
                         }
                       >
@@ -479,8 +482,7 @@ export class Dapp extends React.Component {
           <button
             type="button"
             className="btn btn-primary btn-success"
-            onClick=
-            {() => this._updateContracts()}
+            onClick={() => this._updateContracts()}
           >
             Update Contracts
           </button>
@@ -651,7 +653,7 @@ export class Dapp extends React.Component {
       _policyPrice = await this.props.insuranceContract.pricePremium(
         {
           id: this.state.shipId,
-          shipmentValue: this.state.shipmentValue,
+          shipmentValue: this.state.shipmentValue
         },
         0,
         0,
