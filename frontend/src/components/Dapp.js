@@ -65,7 +65,7 @@ export class Dapp extends React.Component {
         <div className="row">
           <div className="col-12">
             <h2>
-              🚢 <b>Ocean Storrm</b>
+              🚢 <b>Ocean Storm</b>
             </h2>
           </div>
         </div>
