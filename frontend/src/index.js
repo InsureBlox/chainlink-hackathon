@@ -22,7 +22,7 @@ ReactDOM.render(
   </React.StrictMode>,
   document.getElementById("root")
 );
-/* 
+/*
 if (window.ethereum === undefined) {
   return <NoWalletDetected />;
 }

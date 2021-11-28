@@ -148,30 +148,6 @@ export class Dapp extends React.Component {
         <hr />
 
         <div className="form-group">
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={(event) => this._subscribePolicy(event)}
-          >
-            subscribePolicy
-          </button>
-        </div>
-
-        <hr />
-
-        <div className="form-group">
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={(event) => this._subscribePolicy(event)}
-          >
-            subscribePolicy
-          </button>
-        </div>
-
-        <hr />
-
-        <div className="form-group">
           <div className="form-row">
             <div className="col-sm-6">
               <label htmlFor="inputShipName">Ship Name</label>
@@ -686,15 +662,6 @@ export class Dapp extends React.Component {
         this.setState({ policyPrice: `${_policyPrice.toString()} Wei` });
     } catch (error) {
       console.log(error);
-      return;
-    }
-  }
-
-  async _updateContracts() {
-    try {
-      await insuranceContract.UpdateContracts();
-    } catch (error) {
-      console.log(error)
       return;
     }
   }

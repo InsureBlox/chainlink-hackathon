@@ -7,7 +7,10 @@ export class Contracts extends React.Component {
   constructor(props) {
     super(props);
 
-    this.initialState = {};
+    this.initialState = {
+      policies: [],
+      contract: props.insuranceContract
+    };
 
     this.state = this.initialState;
   }
@@ -30,54 +33,107 @@ export class Contracts extends React.Component {
     return <div>No valid vote</div>;
   }
 
+  async componentDidMount() {
+    const policies = await this.state.contract.getAllPolicies()
+    this.setState({ policies })
+    this._getTotalPremiums();
+    this._getTotalCapitalInsured();
+  }
+
+  async _getTotalCapitalInsured() {
+    try {
+      const totalCapitalInsured = await this.props.insuranceContract.getTotalCapitalInsured();
+      this.setState({ totalCapitalInsured });
+    } catch (error) {
+      console.log(error)
+      return;
+    }
+  }
+
+  async _getTotalPremiums() {
+    try {
+      const totalPremiums = await this.props.insuranceContract.getTotalPremiums();
+      this.setState({ totalPremiums });
+    } catch (error) {
+      console.log(error)
+      return;
+    }
+  }
+
   render() {
     if (window.ethereum === undefined || !this.props.selectedAddress) {
       return <NoWalletDetected />;
     }
 
     return (
-      <div className="tableWrapper">
-        <div className="tableWrapper2">
-          <table>
-            <thead>
-              <tr>
-                <th>Cover Id</th>
-                <th>Address</th>
-                <th>Sum Assured</th>
-                <th>Currency</th>
-                <th>Purchase Date</th>
-                <th>Expiry</th>
-                <th>Claim Id</th>
-                <th>Vote</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {contracts.map((contract, index) => {
-                return (
-                  <tr key={index}>
-                    <td>{parseInt(contract.coverId.hex, 16)}</td>
-                    <td>
-                      <a
-                        target="_blank"
-                        rel="noreferrer"
-                        href={`https://kovan.etherscan.io/tx/${contract.address}`}
-                      >
-                        View
-                      </a>
-                    </td>
-                    <td>{parseInt(contract.sumAssured.hex, 16)}</td>
-                    <td>{contract.currency}</td>
-                    <td>{this.formatDate(contract.purchaseDate)}</td>
-                    <td>{this.formatDate(contract.expiry)}</td>
-                    <td>{contract.claimId}</td>
-                    <td>{this.formatVote(contract.vote)}</td>
-                    <td>{contract.status}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+      <div>
+        <h1><b>Total Value Insured</b></h1>
+        <hr />
+
+        <div class="container">
+          <div class="row">
+            <div class="col text-light bg-dark mb-2 p-3 rounded-sm shadow border border-white">
+              Ocean Storm protocol has earned
+              <h2>{parseFloat(this.state.totalPremiums) / 1e18} ETH</h2>
+              in paid policy premiums
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col text-light bg-info mb-2 p-3 rounded-sm shadow border border-white">
+              Ocean Storm is now insuring
+              <h2>{parseFloat(this.state.totalCapitalInsured) / 1e18} ETH</h2>
+              in capital value
+            </div>
+          </div>
+
+          <div class="row">
+            <div className="col form-group p-0">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => this._getTotalPremiums()}
+              >
+                Update
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <br />
+
+        <h1><b>Status of our Policies</b></h1>
+        <hr />
+
+        <div className="tableWrapper">
+          <div className="tableWrapper2">
+            <table>
+              <thead>
+                <tr>
+                  <th>Cover Id</th>
+                  <th>Ship Id</th>
+                  <th>Cover Amount</th>
+                  <th>Gust</th>
+                  <th>Location</th>
+                  <th>Incidents</th>
+                </tr>
+              </thead>
+              <tbody>
+                {this.state.policies.map((policy, index) => {
+                  return (
+                    <tr key={index}>
+                      <td>{policy.policyId.toString()}</td>
+                      <td>{policy.ship.id}</td>
+                      <td>{parseFloat(policy.ship.shipmentValue) / 1e18} ETH</td>
+                      <td>{policy.weatherData.gust.toString()}</td>
+                      <td>{policy.weatherData.location}</td>
+                      <td>{policy.incidents}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     );

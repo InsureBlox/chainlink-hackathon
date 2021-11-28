@@ -11,8 +11,6 @@ import { Contracts } from "./Contracts";
 const HARDHAT_NETWORK_ID = "31337";
 const KOVAN_NETWORK_ID = "42";
 
-let insuranceContract;
-
 export class DappWrapper extends React.Component {
   constructor(props) {
     super(props);
@@ -38,7 +36,7 @@ export class DappWrapper extends React.Component {
   async _intializeEthers() {
     this._provider = new providers.Web3Provider(window.ethereum);
 
-    insuranceContract = await new Contract(
+    this.insuranceContract = await new Contract(
       contractAddress.Contract,
       DelayInsuranceArtifact.abi,
       this._provider.getSigner(0)
@@ -94,12 +92,12 @@ export class DappWrapper extends React.Component {
     return false;
   }
 
-  render() {
-    if (window.ethereum === undefined) {
-      return <NoWalletDetected />;
-    }
+  componentDidMount() {
 
-    if (!this.state.selectedAddress) {
+  }
+
+  render() {
+    if (!this.state.selectedAddress || !this.insuranceContract) {
       return (
         <ConnectWallet
           connectWallet={() => this._connectWallet()}
@@ -107,6 +105,10 @@ export class DappWrapper extends React.Component {
           dismiss={() => this._dismissNetworkError()}
         />
       );
+    }
+
+    if (window.ethereum === undefined) {
+      return <NoWalletDetected />;
     }
 
     return (
