@@ -467,36 +467,6 @@ export class Dapp extends React.Component {
             Buy Policy
           </button>
         </div>
-
-        <div className="form-group">
-          <button
-            type="button"
-            className="btn btn-primary btn-success"
-            onClick={() => this._updatePolicyStatus()}
-          >
-            Update Policy Status
-          </button>
-        </div>
-
-        <div className="form-group">
-          <button
-            type="button"
-            className="btn btn-primary btn-success"
-            onClick={() => this._updateContracts()}
-          >
-            Update Contracts
-          </button>
-        </div>
-
-        <div className="form-group">
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => this._pricePremium()}
-          >
-            Get Policy Price
-          </button>
-        </div>
       </>
     );
   }
