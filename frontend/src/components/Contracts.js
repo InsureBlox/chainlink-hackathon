@@ -62,6 +62,23 @@ export class Contracts extends React.Component {
     }
   }
 
+  decodeStatus(_policyStatusRaw) {
+    switch (_policyStatusRaw) {
+      case 0:
+        return "CREATED";
+      case 1:
+        return "RUNNING";
+      case 2:
+        return "COMPLETED";
+      case 3:
+        return "CLAIMED";
+      case 4:
+        return "PAIDOUT";
+      default:
+        return "UNKNOWN";
+    }
+  }
+
   render() {
     if (window.ethereum === undefined || !this.props.selectedAddress) {
       return <NoWalletDetected />;
@@ -119,9 +136,7 @@ export class Contracts extends React.Component {
                   <th>Cover Id</th>
                   <th>Ship Id</th>
                   <th>Cover Amount</th>
-                  <th>Gust</th>
-                  <th>Location</th>
-                  <th>Incidents</th>
+                  <th>Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -133,9 +148,7 @@ export class Contracts extends React.Component {
                       <td>
                         {parseFloat(policy.ship.shipmentValue) / 1e18} ETH
                       </td>
-                      <td>{policy.weatherData.gust.toString()}</td>
-                      <td>{policy.weatherData.location}</td>
-                      <td>{policy.incidents}</td>
+                      <td>{this.decodeStatus(policy.coverage.status)}</td>
                     </tr>
                   );
                 })}
