@@ -65,7 +65,7 @@ export class Dapp extends React.Component {
         <div className="row">
           <div className="col-12">
             <h2>
-              🚢 <b>Shipment Delay Policy</b>
+              🚢 <b>Ocean Storrm</b>
             </h2>
           </div>
         </div>
@@ -75,73 +75,6 @@ export class Dapp extends React.Component {
         <div className="row">
           <div className="col-12">
             <p>Subscribe to a Ocean Storm policy today!</p>
-          </div>
-        </div>
-
-        <div className="row">
-          <div className="col-12">
-            <h4>Insurance Parameters</h4>
-
-            <div className="row">
-              <div className="col-sm-4">
-                <label htmlFor="inputPolicyThreshold">Policy Threshold</label>
-                <input
-                  type="number"
-                  min="0"
-                  className="form-control"
-                  id="inputPolicyThreshold"
-                  value={this.state.policyThreshold}
-                  onChange={(e) =>
-                    this.setState({ policyThreshold: e.target.value })
-                  }
-                />
-              </div>
-
-              <div className="col-sm-4">
-                <label htmlFor="inputIncidentsThreshold">
-                  Incidents Threshold
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  className="form-control"
-                  id="inputIncidentsThreshold"
-                  value={this.state.incidentsThreshold}
-                  onChange={(e) =>
-                    this.setState({ incidentsThreshold: e.target.value })
-                  }
-                />
-              </div>
-
-              <div className="col-sm-4">
-                <label htmlFor="inputKeepersInterval">Keepers Interval</label>
-                <input
-                  type="number"
-                  min="0"
-                  className="form-control"
-                  id="inputKeepersInterval"
-                  aria-describedby="keepersIntervalHelp"
-                  value={this.state.keepersInterval}
-                  onChange={(e) =>
-                    this.setState({ keepersInterval: e.target.value })
-                  }
-                />
-                <small
-                  id="keepersIntervalHelp"
-                  className="form-text text-muted"
-                >
-                  In seconds
-                </small>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              className="btn btn-info"
-              onClick={() => this._updateParameters()}
-            >
-              Update Parameters
-            </button>
           </div>
         </div>
 
