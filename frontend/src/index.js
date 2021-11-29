@@ -22,18 +22,3 @@ ReactDOM.render(
   </React.StrictMode>,
   document.getElementById("root")
 );
-/*
-if (window.ethereum === undefined) {
-  return <NoWalletDetected />;
-}
-
-if (!this.state.selectedAddress) {
-  return (
-    <ConnectWallet
-      connectWallet={() => this._connectWallet()}
-      networkError={this.state.networkError}
-      dismiss={() => this._dismissNetworkError()}
-    />
-  );
-}
- */

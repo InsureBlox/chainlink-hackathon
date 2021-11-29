@@ -14,7 +14,7 @@ export class Dapp extends React.Component {
   constructor(props) {
     super(props);
 
-    this.initialState = {
+    const initialStateFilled = {
       transactionError: undefined,
       networkError: undefined,
       shipId: "4ae72971-77b3-9167-973e-1da1c773ad41",
@@ -28,7 +28,21 @@ export class Dapp extends React.Component {
       policyStatus: ""
     };
 
-    this.state = this.initialState;
+    const initialStateEmpty = {
+      transactionError: undefined,
+      networkError: undefined,
+      shipId: "",
+      shipName: "",
+      shipmentValue: "",
+      departurePort: "",
+      departureDate: "",
+      arrivalPort: "",
+      arrivalDate: "",
+      policyId: "",
+      policyStatus: ""
+    };
+
+    this.state = initialStateEmpty;
   }
 
   render() {
