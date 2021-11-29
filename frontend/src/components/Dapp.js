@@ -1,12 +1,9 @@
 import React from "react";
-// import axios from "axios";
 
 import { providers, utils } from "ethers";
 
 import { NoWalletDetected } from "./NoWalletDetected";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
-
-// import { JsonToTable } from "react-json-to-table";
 
 import ports from "../api/ports.json";
 import vessels from "../api/vessels.json";
@@ -32,27 +29,6 @@ export class Dapp extends React.Component {
     };
 
     this.state = this.initialState;
-  }
-
-  componentDidMount() {
-    /* const headers = {
-      "Content-Type": "application/json", // "application/x-www-form-urlencoded", // "text/plain",
-      "Access-Control-Allow-Origin": "*",
-    };
-
-    axios
-      .get(
-        "https://api.datalastic.com/api/v0/vessel_inradius?api-key=f9ff0ee8-5644-43e5-847d-39cbd67858e1&lat=29.15915&lon=-89.25454&radius=10",
-        { headers }
-      )
-      .then(function (response) {
-        // handle success
-        console.log(response);
-      })
-      .catch(function (error) {
-        // handle error
-        console.log(error);
-      }); */
   }
 
   render() {
@@ -371,24 +347,6 @@ export class Dapp extends React.Component {
           </div>
         </div>
 
-        {/* <div>State</div>
-        <div>{process.env.REACT_APP_VESSEL_API_KEY}</div>
-        {this.state.departureDate && (
-          <div>
-            Unix departure date:{" "}
-            {(new Date(this.state.departureDate).getTime() / 1000).toString()}
-          </div>
-        )}
-        {this.state.arrivalDate && (
-          <div>
-            Unix arrival date:{" "}
-            {(new Date(this.state.arrivalDate).getTime() / 1000).toString()}
-          </div>
-        )}
-        <div className="word-break">
-          <JsonToTable json={this.state} />
-        </div> */}
-
         <hr />
 
         <div className="form-group">
@@ -419,22 +377,6 @@ export class Dapp extends React.Component {
   _resetState() {
     this.setState(this.initialState);
   }
-
-  /* _checkNetwork() {
-    if (
-      window.ethereum.networkVersion === HARDHAT_NETWORK_ID ||
-      window.ethereum.networkVersion === KOVAN_NETWORK_ID
-    ) {
-      return true;
-    }
-
-    this.setState({
-      networkError:
-        "Please connect Metamask to Localhost:8545 or Kovan network.",
-    });
-
-    return false;
-  } */
 
   async _subscribePolicy(event) {
     event.preventDefault();
