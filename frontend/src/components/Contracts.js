@@ -64,12 +64,12 @@ export class Contracts extends React.Component {
 
   decodeStatus(_policyStatusRaw) {
     switch (_policyStatusRaw) {
-      case 0: return <div class="badge badge-secondary">CREATED</div>;
-      case 1: return <div class="badge badge-info">RUNNING</div>;
-      case 2: return <div class="badge badge-primary">COMPLETED</div>;
-      case 3: return <div class="badge badge-warning">CLAIMED</div>;
-      case 4: return <div class="badge badge-success">PAIDOUT</div>;
-      default:return <div class="badge badge-danger">UNKNOWN</div>;
+      case 0: return <div className="badge badge-secondary">CREATED</div>;
+      case 1: return <div className="badge badge-info">RUNNING</div>;
+      case 2: return <div className="badge badge-primary">COMPLETED</div>;
+      case 3: return <div className="badge badge-warning">CLAIMED</div>;
+      case 4: return <div className="badge badge-success">PAIDOUT</div>;
+      default:return <div className="badge badge-danger">UNKNOWN</div>;
     }
   }
 
