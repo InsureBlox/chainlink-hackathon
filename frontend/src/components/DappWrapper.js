@@ -7,6 +7,7 @@ import { NoWalletDetected } from "./NoWalletDetected";
 import { ConnectWallet } from "./ConnectWallet";
 import { Dapp } from "./Dapp";
 import { Contracts } from "./Contracts";
+import { Ship } from "./Ship";
 
 const HARDHAT_NETWORK_ID = "31337";
 const KOVAN_NETWORK_ID = "42";
@@ -133,6 +134,12 @@ export class DappWrapper extends React.Component {
                 selectedAddress={this.state.selectedAddress}
                 insuranceContract={this.insuranceContract}
               />
+            }
+          />
+          <Route
+            path="/ship/:shipId"
+            element={
+              <Ship />
             }
           />
         </Routes>

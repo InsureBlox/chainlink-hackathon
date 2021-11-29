@@ -1,7 +1,7 @@
 import React from "react";
 import { NoWalletDetected } from "./NoWalletDetected";
-// import contracts from "../assets/contracts.json";
 import "./contracts.css";
+import { Link } from 'react-router-dom';
 
 export class Contracts extends React.Component {
   constructor(props) {
@@ -138,7 +138,7 @@ export class Contracts extends React.Component {
                   return (
                     <tr key={index}>
                       <td>{policy.policyId.toString()}</td>
-                      <td>{policy.ship.id}</td>
+                      <td><Link to={`/ship/${policy.ship.id}`}>{policy.ship.id}</Link></td>
                       <td>
                         {parseFloat(policy.ship.shipmentValue) / 1e18} ETH
                       </td>
