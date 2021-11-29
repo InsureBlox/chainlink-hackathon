@@ -93,10 +93,6 @@ export class DappWrapper extends React.Component {
     return false;
   }
 
-  componentDidMount() {
-
-  }
-
   render() {
     if (!this.state.selectedAddress || !this.insuranceContract) {
       return (

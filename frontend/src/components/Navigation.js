@@ -1,7 +1,6 @@
 import React from "react";
 import background from "../assets/sea.jpg";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import icon from "../assets/favicon.png";
 
 export function Navigation() {
