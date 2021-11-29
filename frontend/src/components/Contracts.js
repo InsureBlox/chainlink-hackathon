@@ -73,6 +73,15 @@ export class Contracts extends React.Component {
     }
   }
 
+  toPlainString(num) {
+    return (''+ +num).replace(/(-?)(\d*)\.?(\d*)e([+-]\d+)/,
+      function(a,b,c,d,e) {
+        return e < 0
+          ? b + '0.' + Array(1-e-c.length).join(0) + c + d
+          : b + c + d + Array(e-d.length+1).join(0);
+      });
+  }
+
   render() {
     if (window.ethereum === undefined || !this.props.selectedAddress) {
       return <NoWalletDetected />;
@@ -140,7 +149,7 @@ export class Contracts extends React.Component {
                       <td>{policy.policyId.toString()}</td>
                       <td><Link to={`/ship/${policy.ship.id}`}>{policy.ship.id}</Link></td>
                       <td>
-                        {parseFloat(policy.ship.shipmentValue) / 1e18} ETH
+                        {this.toPlainString(parseFloat(policy.ship.shipmentValue) / 1e18)} ETH
                       </td>
                       <td>{this.decodeStatus(policy.coverage.status)}</td>
                     </tr>
