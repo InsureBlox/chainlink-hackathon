@@ -4,6 +4,7 @@
   "description": "Ocean Storm by InsureBlox - Chainlink Hackathon",
   "main": "index.js",
   "scripts": {
+    "dev": "cd frontend && npm run build && cd ../ && nodemon server/index.js",
     "start": "node server/index.js",
     "build": "cd frontend && npm install && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -23,8 +24,12 @@
     "@chainlink/contracts": "^0.2.2",
     "@nomiclabs/hardhat-etherscan": "^2.1.8",
     "@openzeppelin/test-helpers": "^0.5.15",
+    "axios": "^0.24.0",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "nodemon": "^2.0.15",
     "react-json-to-table": "^0.1.7"
   }
 }

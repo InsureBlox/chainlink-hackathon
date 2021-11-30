@@ -21,9 +21,13 @@ export class Dapp extends React.Component {
       shipName: "QUEEN MARY",
       shipmentValue: "1000",
       departurePort: "MALAGA",
+      departurePorts: [],
+      departurePortsLoading: false,
       departureDate: "2021-12-01",
       arrivalPort: "CHENNAI",
       arrivalDate: "2021-12-31",
+      arrivalPorts: [],
+      arrivalPortsLoading: false,
       policyId: "",
       policyStatus: ""
     };
@@ -35,14 +39,114 @@ export class Dapp extends React.Component {
       shipName: "",
       shipmentValue: "",
       departurePort: "",
+      departurePorts: [],
+      departurePortsLoading: false,
       departureDate: "",
       arrivalPort: "",
       arrivalDate: "",
+      arrivalPorts: [],
+      arrivalPortsLoading: false,
       policyId: "",
       policyStatus: ""
     };
 
     this.state = initialStateEmpty;
+
+    this.requestArrivalPortsApi = this.requestArrivalPortsApi.bind(this);
+    this.requestDeparturePortsApi = this.requestDeparturePortsApi.bind(this);
+    this.handleChangeDeparturePort = this.handleChangeDeparturePort.bind(this);
+  }
+
+  requestDeparturePortsApi(port_name) {
+    this.setState({ departurePortsLoading: true });
+    fetch(`/api`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        method: "port_find",
+        params: {
+          name: port_name
+        }
+      })
+    })
+      .then((res) => res.json())
+      .then((response) => {
+        this.setState({ departurePorts: response.data });
+      })
+      .catch((error) => {
+        console.log(error);
+        const portsFiltered = ports.data.filter((port) => {
+          return (
+            port.port_name.includes(this.state.departurePort.toUpperCase()) &&
+            this.state.departurePort !== "" &&
+            !this.state.departurePortObject
+          );
+        });
+        this.setState({ departurePorts: portsFiltered });
+      })
+      .finally(() => {
+        this.setState({ departurePortsLoading: false });
+      });
+  }
+
+  requestArrivalPortsApi(port_name) {
+    this.setState({ arrivalPortsLoading: true });
+    fetch(`/api`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        method: "port_find",
+        params: {
+          name: port_name
+        }
+      })
+    })
+      .then((res) => res.json())
+      .then((response) => {
+        this.setState({ arrivalPorts: response.data });
+      })
+      .catch((error) => {
+        console.log(error);
+        const portsFiltered = ports.data.filter((port) => {
+          return (
+            port.port_name.includes(this.state.arrivalPort.toUpperCase()) &&
+            this.state.arrivalPort !== "" &&
+            !this.state.arrivalPortObject
+          );
+        });
+        this.setState({ arrivalPorts: portsFiltered });
+      })
+      .finally(() => {
+        this.setState({ arrivalPortsLoading: false });
+      });
+  }
+
+  handleChangeDeparturePort(e) {
+    if (!this.state.departurePortObject) {
+      this.setState({ departurePort: e.target.value });
+
+      if (e.target.value.length > 2) {
+        this.requestDeparturePortsApi(e.target.value);
+      } else {
+        this.setState({ departurePorts: [] });
+      }
+    }
+  }
+
+  handleChangeArrivalPort(e) {
+    if (!this.state.arrivalPortObject) {
+      this.setState({ arrivalPort: e.target.value });
+
+      if (e.target.value.length > 2) {
+        this.requestArrivalPortsApi(e.target.value);
+      } else {
+        this.setState({ arrivalPorts: [] });
+      }
+    }
   }
 
   render() {
@@ -182,11 +286,7 @@ export class Dapp extends React.Component {
                   aria-describedby="departurePortHelp"
                   placeholder="Port of departure"
                   value={this.state.departurePort}
-                  onChange={(e) =>
-                    !this.state.departurePortObject
-                      ? this.setState({ departurePort: e.target.value })
-                      : null
-                  }
+                  onChange={(e) => this.handleChangeDeparturePort(e)}
                 />
                 <button
                   className={`btn ${
@@ -198,7 +298,8 @@ export class Dapp extends React.Component {
                   onClick={() =>
                     this.setState({
                       departurePort: "",
-                      departurePortObject: undefined
+                      departurePortObject: undefined,
+                      departurePorts: []
                     })
                   }
                 >
@@ -209,17 +310,9 @@ export class Dapp extends React.Component {
                 Type the port name and select one port
               </small>
               <div>
-                {ports.data
-                  .filter((port) => {
-                    return (
-                      port.port_name.includes(
-                        this.state.departurePort.toUpperCase()
-                      ) &&
-                      this.state.departurePort !== "" &&
-                      !this.state.departurePortObject
-                    );
-                  })
-                  .map((port, index) => {
+                {this.state.departurePortsLoading && <div>Loading...</div>}
+                {!this.state.departurePortsLoading &&
+                  this.state.departurePorts.map((port, index) => {
                     return (
                       <div
                         key={index}
@@ -227,7 +320,8 @@ export class Dapp extends React.Component {
                         onClick={() =>
                           this.setState({
                             departurePort: port.port_name,
-                            departurePortObject: port
+                            departurePortObject: port,
+                            departurePorts: []
                           })
                         }
                       >
@@ -272,11 +366,7 @@ export class Dapp extends React.Component {
                   aria-describedby="arrivalPortHelp"
                   placeholder="Port of arrival"
                   value={this.state.arrivalPort}
-                  onChange={(e) =>
-                    !this.state.arrivalPortObject
-                      ? this.setState({ arrivalPort: e.target.value })
-                      : null
-                  }
+                  onChange={(e) => this.handleChangeArrivalPort(e)}
                 />
                 <button
                   className={`btn ${
@@ -288,28 +378,21 @@ export class Dapp extends React.Component {
                   onClick={() =>
                     this.setState({
                       arrivalPort: "",
-                      arrivalPortObject: undefined
+                      arrivalPortObject: undefined,
+                      arrivalPorts: []
                     })
                   }
                 >
                   x
                 </button>
               </div>
-              <small id="departurePortHelp" className="form-text text-muted">
+              <small id="arrivalPortHelp" className="form-text text-muted">
                 Type the port name and select one port
               </small>
               <div>
-                {ports.data
-                  .filter((port) => {
-                    return (
-                      port.port_name.includes(
-                        this.state.arrivalPort.toUpperCase()
-                      ) &&
-                      this.state.arrivalPort !== "" &&
-                      !this.state.arrivalPortObject
-                    );
-                  })
-                  .map((port, index) => {
+                {this.state.arrivalPortsLoading && <div>Loading...</div>}
+                {!this.state.arrivalPortsLoading &&
+                  this.state.arrivalPorts.map((port, index) => {
                     return (
                       <div
                         key={index}
@@ -317,7 +400,8 @@ export class Dapp extends React.Component {
                         onClick={() =>
                           this.setState({
                             arrivalPort: port.port_name,
-                            arrivalPortObject: port
+                            arrivalPortObject: port,
+                            arrivalPorts: []
                           })
                         }
                       >
