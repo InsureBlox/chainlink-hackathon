@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { GoogleMap, useJsApiLoader, Marker } from "@react-google-maps/api";
 import vessels from "../api/vessels.json";
 import "./contracts.css";
 
@@ -53,6 +54,23 @@ export function Ship() {
     fetchData();
   }, []);
 
+  const { mapsIsLoaded } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: "AIzaSyBxrCEA9WIxcsRFAsRQRwYk_-mRX59Gc5Y" // process.env.REACT_APP_GOOGLE_MAPS_API_KEY //
+  });
+
+  const [map, setMap] = React.useState(null);
+
+  const onLoad = React.useCallback(function callback(map) {
+    /* const bounds = new window.google.maps.LatLngBounds();
+    map.fitBounds(bounds); */
+    setMap(map);
+  }, []);
+
+  const onUnmount = React.useCallback(function callback(map) {
+    setMap(null);
+  }, []);
+
   if (!ship)
     return (
       <div>
@@ -88,6 +106,32 @@ export function Ship() {
             </tbody>
           </table>
         </div>
+      </div>
+      <div className="pt-3">
+        <GoogleMap
+          mapContainerStyle={{
+            width: "100%",
+            height: "400px"
+          }}
+          initialCenter={{ lat: ship.lat, lng: ship.lon }}
+          center={{
+            lat: ship.lat,
+            lng: ship.lon
+          }}
+          zoom={6}
+          onLoad={onLoad}
+          onUnmount={onUnmount}
+        >
+          {/* Child components, such as markers, info windows, etc. */}
+          <>
+            <Marker
+              position={{
+                lat: ship.lat,
+                lng: ship.lon
+              }}
+            />
+          </>
+        </GoogleMap>
       </div>
     </div>
   );
