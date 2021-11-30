@@ -38,6 +38,16 @@ const requestVesselApi = async (vessel_uuid) => {
     });
 };
 
+const formatData = (key, value) => {
+  if (key === "speed") {
+    value = value + " knot";
+  }
+  if (key === "course" || key === "heading") {
+    value = value + " degrees";
+  }
+  return value;
+};
+
 export function Ship() {
   // eslint-disable-next-line
   const navigate = useNavigate();
@@ -99,7 +109,7 @@ export function Ship() {
                 return (
                   <tr key={index}>
                     <td>{key}</td>
-                    <td>{ship[key]}</td>
+                    <td>{formatData(key, ship[key])}</td>
                   </tr>
                 );
               })}
