@@ -26,6 +26,9 @@ app.post("/api", function (req, res) {
   if (req.body.method === "vessel") {
     params = `&uuid=${req.body.params.uuid}`;
   }
+  if (req.body.method === "vessel_pro") {
+    params = `&uuid=${req.body.params.uuid}`;
+  }
   if (req.body.method === "port_find") {
     params = `&name=${req.body.params.name}`;
   }

@@ -22,7 +22,7 @@ const requestVesselApi = async (vessel_uuid) => {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      method: "vessel",
+      method: "vessel_pro",
       params: {
         uuid: vessel_uuid
       }
@@ -30,6 +30,22 @@ const requestVesselApi = async (vessel_uuid) => {
   })
     .then((res) => res.json())
     .then((response) => {
+      /*  await fetch(`/api`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          method: "vessel",
+          params: {
+            uuid: vessel_uuid
+          }
+        })
+      })
+        .then((res) => res.json())
+        .then((responsePort) => {
+          return response.data;
+        }) */
       return response.data;
     })
     .catch((error) => {
