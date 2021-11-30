@@ -32,7 +32,7 @@ npx hardhat help
 1. `npx hardhat node` or `npx hardhat node --hostname 127.0.0.1`
 2. `npx hardhat run scripts/deploy.js --network localhost`
 
-> ℹ️  Connect metamask to Localhost:8545: RPC URL: http://localhost:8545 | Chain ID: 31337
+> ℹ️ Connect metamask to Localhost:8545: RPC URL: http://localhost:8545 | Chain ID: 31337
 
 ### Deploy
 
@@ -42,7 +42,7 @@ npx hardhat help
 
 Add and `.env` under `/frontend` folder with the following instruction:
 
-`SKIP_PREFLIGHT_CHECK=true` 
+`SKIP_PREFLIGHT_CHECK=true`
 
 See more [details](https://newbedev.com/javascript-skip-preflight-check-true-to-an-env-file-in-your-project-code-example)
 
@@ -64,3 +64,10 @@ Run the following command to perform the unit tests:
 **Test coverage**
 
 `npx hardhat coverage`
+
+### Deployed on heroku
+
+Deployment commands
+
+- git push heroku master
+- git push heroku feature/add-real-api:master

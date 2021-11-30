@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import vessels from "../api/vessels.json";
 import "./contracts.css";
 
-const getShipViaId = (shipId) => {
+const getShipViaMockData = (shipId) => {
   const vesselFiltered = vessels.data.vessels.filter(
     (vessel) => vessel.uuid === shipId
   );
@@ -14,19 +14,51 @@ const getShipViaId = (shipId) => {
   }
 };
 
+const requestVesselApi = async (vessel_uuid) => {
+  return await fetch(`/api`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      method: "vessel",
+      params: {
+        uuid: vessel_uuid
+      }
+    })
+  })
+    .then((res) => res.json())
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return getShipViaMockData(vessel_uuid);
+    });
+};
+
 export function Ship() {
   // eslint-disable-next-line
   const navigate = useNavigate();
+  const [ship, setShip] = useState(undefined);
 
   const shipId = window.location.pathname.replace("/ship/", "");
-  const ship = getShipViaId(shipId);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await requestVesselApi(shipId);
+      setShip(result);
+    };
+
+    fetchData();
+  }, []);
 
   if (!ship)
     return (
       <div>
         {" "}
         <h1>
-          <b>Ship not found</b>
+          <b>Loading...</b>
         </h1>
         <Link to="/contracts">Back</Link>
       </div>

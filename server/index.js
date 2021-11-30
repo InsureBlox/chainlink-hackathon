@@ -23,6 +23,9 @@ app.post("/api", function (req, res) {
   if (req.body.method === "vessel_inradius") {
     params = `&lat=${req.body.params.lat}&lon=${req.body.params.lon}&radius=${req.body.params.radius}`;
   }
+  if (req.body.method === "vessel") {
+    params = `&uuid=${req.body.params.uuid}`;
+  }
   if (req.body.method === "port_find") {
     params = `&name=${req.body.params.name}`;
   }
