@@ -82,7 +82,7 @@ export function Ship() {
 
   const { mapsIsLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: "AIzaSyBxrCEA9WIxcsRFAsRQRwYk_-mRX59Gc5Y" // process.env.REACT_APP_GOOGLE_MAPS_API_KEY //
+    googleMapsApiKey: process.env.REACT_APP_MAPS_API_KEY
   });
 
   const [map, setMap] = React.useState(null);
