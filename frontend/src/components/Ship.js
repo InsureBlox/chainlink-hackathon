@@ -1,9 +1,30 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  GoogleMap,
+  useJsApiLoader,
+  Marker,
+  Polyline
+} from "@react-google-maps/api";
 import vessels from "../api/vessels.json";
 import "./contracts.css";
+import { destVincenty } from "../misc/calculation";
 
-const getShipViaId = (shipId) => {
+const options = {
+  strokeColor: "#FF0000",
+  strokeOpacity: 0.8,
+  strokeWeight: 2,
+  fillColor: "#FF0000",
+  fillOpacity: 0.35,
+  clickable: false,
+  draggable: false,
+  editable: false,
+  visible: true,
+  radius: 30000,
+  zIndex: 1
+};
+
+const getShipViaMockData = (shipId) => {
   const vesselFiltered = vessels.data.vessels.filter(
     (vessel) => vessel.uuid === shipId
   );
@@ -14,19 +35,186 @@ const getShipViaId = (shipId) => {
   }
 };
 
+const requestPortApi = async (port_name) => {
+  return await fetch(`/api`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      method: "port_find",
+      params: {
+        name: port_name
+      }
+    })
+  })
+    .then((res) => res.json())
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      return [];
+    });
+};
+
+const requestVesselHistoryApi = async (uuid, from, to) => {
+  return await fetch(`/api`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      method: "vessel_history",
+      params: {
+        uuid,
+        from: new Date(from).toISOString().slice(0, 10),
+        to: new Date(to).toISOString().slice(0, 10)
+      }
+    })
+  })
+    .then((res) => res.json())
+    .then((response) => {
+      return response.data.positions;
+    })
+    .catch((error) => {
+      console.log(error);
+      return [];
+    });
+};
+
+const requestVesselApi = async (vessel_uuid) => {
+  return await fetch(`/api`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      method: "vessel_pro",
+      params: {
+        uuid: vessel_uuid
+      }
+    })
+  })
+    .then((res) => res.json())
+    .then(async (response) => {
+      let port_departure;
+      if (response.data.dep_port) {
+        port_departure = await requestPortApi(response.data.dep_port);
+        if (port_departure.length > 1) {
+          port_departure = port_departure[0];
+        }
+      }
+      let port_destination;
+      if (response.data.dest_port) {
+        port_destination = await requestPortApi(response.data.dest_port);
+        if (port_destination.length > 1) {
+          port_destination = port_destination[0];
+        }
+      }
+      let ship = response.data;
+      if (port_departure) {
+        ship = {
+          ...ship,
+          dep_port_uuid: port_departure.uuid,
+          dep_port_lat: port_departure.lat,
+          dep_port_lon: port_departure.lon
+        };
+      }
+      if (port_destination) {
+        ship = {
+          ...ship,
+          dest_port_uuid: port_destination.uuid,
+          dest_port_lat: port_destination.lat,
+          dest_port_lon: port_destination.lon
+        };
+      }
+      let positions = [];
+      positions = await requestVesselHistoryApi(
+        ship.uuid,
+        "2021-11-24",
+        "2021-12-02"
+      );
+      return { ship, positions };
+    })
+    .catch((error) => {
+      console.log(error);
+      return getShipViaMockData(vessel_uuid);
+    });
+};
+
+const formatData = (key, value) => {
+  if (key === "speed") {
+    value = value + " knot";
+  }
+  if (key === "course" || key === "heading") {
+    value = value + " degrees";
+  }
+  if (key === "last_position_UTC" || key === "atd_UTC" || key === "eta_UTC") {
+    value = new Date(value).toLocaleString();
+  }
+  return value;
+};
+
 export function Ship() {
   // eslint-disable-next-line
   const navigate = useNavigate();
+  const [ship, setShip] = useState(undefined);
+  const [positions, setPositions] = useState([]);
 
   const shipId = window.location.pathname.replace("/ship/", "");
-  const ship = getShipViaId(shipId);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await requestVesselApi(shipId);
+      setShip(result.ship);
+      setPositions(result.positions);
+    };
+
+    fetchData();
+  }, []);
+
+  const { mapsIsLoaded } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: process.env.REACT_APP_MAPS_API_KEY
+  });
+
+  const [map, setMap] = React.useState(null);
+
+  const onLoad = React.useCallback(function callback(map) {
+    /* const bounds = new window.google.maps.LatLngBounds();
+    map.fitBounds(bounds); */
+    setMap(map);
+  }, []);
+
+  const onUnmount = React.useCallback(function callback(map) {
+    setMap(null);
+  }, []);
+
+  const shipCourse =
+    ship && ship.course && ship.lat && ship.lon
+      ? destVincenty(ship.lat, ship.lon, ship.course, 400000)
+      : undefined;
+
+  let positionMarkers = [];
+  for (let i = 0; i < positions.length - 1; i++) {
+    positionMarkers.push(
+      <Polyline
+        path={[
+          { lat: positions[i].lat, lng: positions[i].lon },
+          { lat: positions[i + 1].lat, lng: positions[i + 1].lon }
+        ]}
+        options={options}
+      />
+    );
+  }
 
   if (!ship)
     return (
       <div>
         {" "}
         <h1>
-          <b>Ship not found</b>
+          <b>Loading...</b>
         </h1>
         <Link to="/contracts">Back</Link>
       </div>
@@ -49,13 +237,65 @@ export function Ship() {
                 return (
                   <tr key={index}>
                     <td>{key}</td>
-                    <td>{ship[key]}</td>
+                    <td>{formatData(key, ship[key])}</td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
         </div>
+      </div>
+      <div className="pt-3">
+        <GoogleMap
+          mapContainerStyle={{
+            width: "100%",
+            height: "400px"
+          }}
+          initialCenter={{ lat: ship.lat, lng: ship.lon }}
+          center={{
+            lat: ship.lat,
+            lng: ship.lon
+          }}
+          zoom={3}
+          onLoad={onLoad}
+          onUnmount={onUnmount}
+        >
+          <>
+            <Marker
+              position={{
+                lat: ship.lat,
+                lng: ship.lon
+              }}
+              title={`Ship: ${ship.name}`}
+            />
+            <Polyline
+              path={[
+                { lat: shipCourse.lat, lng: shipCourse.lon },
+                { lat: ship.lat, lng: ship.lon }
+              ]}
+              options={options}
+            />
+            {positionMarkers}
+            {ship.dep_port_lat && ship.dep_port_lon && (
+              <Marker
+                position={{
+                  lat: ship.dep_port_lat,
+                  lng: ship.dep_port_lon
+                }}
+                title={`Departure: ${ship.dep_port}`}
+              />
+            )}
+            {ship.dest_port_lat && ship.dest_port_lon && (
+              <Marker
+                position={{
+                  lat: ship.dest_port_lat,
+                  lng: ship.dest_port_lon
+                }}
+                title={`Destination: ${ship.dest_port}`}
+              />
+            )}
+          </>
+        </GoogleMap>
       </div>
     </div>
   );
