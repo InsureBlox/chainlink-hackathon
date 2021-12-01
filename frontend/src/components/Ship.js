@@ -4,26 +4,11 @@ import {
   GoogleMap,
   useJsApiLoader,
   Marker,
-  Polyline,
-  Circle
+  Polyline
 } from "@react-google-maps/api";
 import vessels from "../api/vessels.json";
 import "./contracts.css";
 import { destVincenty } from "../misc/calculation";
-
-const options2 = {
-  strokeColor: "#FF0000",
-  strokeOpacity: 0.8,
-  strokeWeight: 2,
-  fillColor: "#FF0000",
-  fillOpacity: 0.35,
-  clickable: false,
-  draggable: false,
-  editable: false,
-  visible: true,
-  radius: 30000,
-  zIndex: 1
-};
 
 const options = {
   strokeColor: "#FF0000",
@@ -134,6 +119,9 @@ const formatData = (key, value) => {
   if (key === "course" || key === "heading") {
     value = value + " degrees";
   }
+  if (key === "last_position_UTC" || key === "atd_UTC" || key === "eta_UTC") {
+    value = new Date(value).toLocaleString();
+  }
   return value;
 };
 
@@ -222,19 +210,11 @@ export function Ship() {
             lat: ship.lat,
             lng: ship.lon
           }}
-          zoom={6}
+          zoom={3}
           onLoad={onLoad}
           onUnmount={onUnmount}
         >
-          {/* Child components, such as markers, info windows, etc. */}
           <>
-            {/* <Circle
-              center={{
-                lat: ship.lat,
-                lng: ship.lon
-              }}
-              options={options}
-            /> */}
             <Marker
               position={{
                 lat: ship.lat,
