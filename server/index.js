@@ -32,6 +32,9 @@ app.post("/api", function (req, res) {
   if (req.body.method === "port_find") {
     params = `&name=${req.body.params.name}&fuzzy=1`;
   }
+  if (req.body.method === "vessel_history") {
+    params = `&uuid=${req.body.params.uuid}&from=${req.body.params.from}&to=${req.body.params.to}`;
+  }
   let url = `https://api.datalastic.com/api/v0/${req.body.method}?api-key=${process.env.REACT_APP_VESSEL_API_KEY}${params}`;
   url = url.replace(/ /g, "").replace(/\[/g, "").replace(/\]/g, "");
   axios

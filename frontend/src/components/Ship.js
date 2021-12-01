@@ -58,6 +58,31 @@ const requestPortApi = async (port_name) => {
     });
 };
 
+const requestVesselHistoryApi = async (uuid, from, to) => {
+  return await fetch(`/api`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      method: "vessel_history",
+      params: {
+        uuid,
+        from: new Date(from).toISOString().slice(0, 10),
+        to: new Date(to).toISOString().slice(0, 10)
+      }
+    })
+  })
+    .then((res) => res.json())
+    .then((response) => {
+      return response.data.positions;
+    })
+    .catch((error) => {
+      console.log(error);
+      return [];
+    });
+};
+
 const requestVesselApi = async (vessel_uuid) => {
   return await fetch(`/api`, {
     method: "POST",
@@ -87,24 +112,30 @@ const requestVesselApi = async (vessel_uuid) => {
           port_destination = port_destination[0];
         }
       }
-      let result = response.data;
+      let ship = response.data;
       if (port_departure) {
-        result = {
-          ...result,
+        ship = {
+          ...ship,
           dep_port_uuid: port_departure.uuid,
           dep_port_lat: port_departure.lat,
           dep_port_lon: port_departure.lon
         };
       }
       if (port_destination) {
-        result = {
-          ...result,
+        ship = {
+          ...ship,
           dest_port_uuid: port_destination.uuid,
           dest_port_lat: port_destination.lat,
           dest_port_lon: port_destination.lon
         };
       }
-      return result;
+      let positions = [];
+      positions = await requestVesselHistoryApi(
+        ship.uuid,
+        "2021-11-24",
+        "2021-12-02"
+      );
+      return { ship, positions };
     })
     .catch((error) => {
       console.log(error);
@@ -129,13 +160,15 @@ export function Ship() {
   // eslint-disable-next-line
   const navigate = useNavigate();
   const [ship, setShip] = useState(undefined);
+  const [positions, setPositions] = useState([]);
 
   const shipId = window.location.pathname.replace("/ship/", "");
 
   useEffect(() => {
     const fetchData = async () => {
       const result = await requestVesselApi(shipId);
-      setShip(result);
+      setShip(result.ship);
+      setPositions(result.positions);
     };
 
     fetchData();
@@ -162,6 +195,19 @@ export function Ship() {
     ship && ship.course && ship.lat && ship.lon
       ? destVincenty(ship.lat, ship.lon, ship.course, 400000)
       : undefined;
+
+  let positionMarkers = [];
+  for (let i = 0; i < positions.length - 1; i++) {
+    positionMarkers.push(
+      <Polyline
+        path={[
+          { lat: positions[i].lat, lng: positions[i].lon },
+          { lat: positions[i + 1].lat, lng: positions[i + 1].lon }
+        ]}
+        options={options}
+      />
+    );
+  }
 
   if (!ship)
     return (
@@ -229,6 +275,7 @@ export function Ship() {
               ]}
               options={options}
             />
+            {positionMarkers}
             {ship.dep_port_lat && ship.dep_port_lon && (
               <Marker
                 position={{
