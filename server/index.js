@@ -30,9 +30,10 @@ app.post("/api", function (req, res) {
     params = `&uuid=${req.body.params.uuid}`;
   }
   if (req.body.method === "port_find") {
-    params = `&name=${req.body.params.name}`;
+    params = `&name=${req.body.params.name}&fuzzy=1`;
   }
   let url = `https://api.datalastic.com/api/v0/${req.body.method}?api-key=${process.env.REACT_APP_VESSEL_API_KEY}${params}`;
+  url = url.replace(/ /g, "").replace(/\[/g, "").replace(/\]/g, "");
   axios
     .get(url)
     .then(function (response) {
